@@ -21,6 +21,7 @@ dist/
 # Local environment configs
 .env
 .env.local
+.env.production
 
 # Temporary or large files
 *.bak
