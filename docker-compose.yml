@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3.9"
 
 services:
   backend:
@@ -6,21 +6,39 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: cheetah-backend
+    restart: always
     ports:
       - "5000:5000"
     env_file:
-      - ./backend/.env
+      - ./backend/.env.production
     volumes:
-      - ./backend:/app
-    restart: unless-stopped
+      - ./backend/uploads:/app/uploads
+      - ./backend/static:/app/static
+    depends_on:
+      - frontend
 
   frontend:
     build:
-      context: .               # 👈 ใช้ root เป็น build context
-      dockerfile: frontend.Dockerfile  # 👈 ใช้ Dockerfile ที่ root หรือเปลี่ยนชื่อใหม่
+      context: ./frontend
+      dockerfile: Dockerfile
     container_name: cheetah-frontend
+    restart: always
     ports:
       - "3000:80"
     environment:
-      - REACT_APP_API_BASE_URL=http://localhost:5000
-    restart: unless-stopped
+      - NODE_ENV=production
+
+  nginx:
+    image: nginx:alpine
+    container_name: cheetah-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
+    depends_on:
+      - frontend
+      - backend
