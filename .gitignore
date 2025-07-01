@@ -1,0 +1,44 @@
+# Node.js dependencies
+node_modules/
+
+# Python virtual environment
+backend/venv/
+__pycache__/
+*.pyc
+
+# macOS system files
+.DS_Store
+
+# IDE/workspace config
+.vscode/
+.idea/
+
+# Build output
+build/
+dist/
+*.log
+
+# Local environment configs
+.env
+.env.local
+
+# Temporary or large files
+*.bak
+*.tmp
+*.swp
+*.sqlite
+*.csv
+
+# Downloaded/scraped folders
+*bolttech.co.th_files/
+*สำหรับพาร์ทเนอร์/
+
+# Uploaded media
+backend/uploads/
+backend/static/uploads/
+
+# Frontend build
+cheetah-insurance-app/build/
+frontend/build/
+bolttech.co.th_files/
+*extracted_insurance_data.csv

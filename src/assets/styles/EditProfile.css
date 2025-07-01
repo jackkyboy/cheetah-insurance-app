@@ -1,0 +1,78 @@
+.edit-profile-page {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.edit-profile-page h2 {
+  text-align: center;
+  color: #ff704d;
+  margin-bottom: 20px;
+}
+
+.edit-profile-form input {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.form-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.save-btn {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background-color: #e57373;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.save-btn:hover {
+  background-color: #45a049;
+}
+
+.cancel-btn:hover {
+  background-color: #d32f2f;
+}
+
+.loading-message,
+.error-message,
+.success-message {
+  text-align: center;
+  margin-bottom: 20px;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.loading-message {
+  background-color: #ffecb3;
+  color: #ff704d;
+}
+
+.error-message {
+  background-color: #ffcdd2;
+  color: #d32f2f;
+}
+
+.success-message {
+  background-color: #c8e6c9;
+  color: #388e3c;
+}

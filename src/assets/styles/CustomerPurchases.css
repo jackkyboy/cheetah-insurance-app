@@ -1,0 +1,64 @@
+.customer-purchases {
+    padding: 20px;
+  }
+  
+  .purchase-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .purchase-item {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background: #f9f9f9;
+  }
+  
+  .purchase-item p {
+    margin: 5px 0;
+  }
+  
+  .status-tag {
+    padding: 5px 10px;
+    border-radius: 4px;
+    color: #fff;
+  }
+  
+  .status-tag.success {
+    background-color: #28a745;
+  }
+  
+  .status-tag.pending {
+    background-color: #ffc107;
+    color: #212529;
+  }
+  
+  .status-tag.failed {
+    background-color: #dc3545;
+  }
+  
+  .add-on-tag {
+    display: inline-block;
+    background: #007bff;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-right: 5px;
+  }
+  
+  .view-document-button {
+    display: inline-block;
+    padding: 8px 12px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  
+  .view-document-button:hover {
+    background-color: #0056b3;
+  }
+  

@@ -1,0 +1,110 @@
+/* General Page Layout */
+/* General Page Layout for PrepareInsuranceInfo */
+.prepare-insurance-page {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 25px;
+  font-family: "Roboto", Arial, sans-serif;
+  color: #333;
+  background-color: #ffffff; /* ใช้สีพื้นหลังที่สว่าง */
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Header Styles */
+.prepare-insurance-page h1 {
+  text-align: center;
+  color: #ff6800; /* ใช้สีแบรนด์ */
+  margin-bottom: 20px;
+  font-size: 2rem;
+  font-weight: bold;
+  border-bottom: 2px solid #ffd1b3; /* สีอ่อนของแบรนด์ */
+  padding-bottom: 10px;
+}
+
+/* Error and Loading Messages */
+.error-message {
+  color: #dc3545;
+  text-align: center;
+  font-size: 1.1rem;
+  margin-top: 20px;
+  padding: 10px;
+  background: #f8d7da;
+  border-radius: 6px;
+  border: 1px solid #f5c6cb;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.loading-message {
+  color: #007bff;
+  text-align: center;
+  font-size: 1.2rem;
+  margin-top: 20px;
+  padding: 10px;
+  background: #d1ecf1;
+  border-radius: 6px;
+  border: 1px solid #bee5eb;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Action Buttons */
+.actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 10px; /* เพิ่มระยะห่างระหว่างปุ่ม */
+}
+
+.back-btn,
+.save-btn {
+  background-color: #ffffff;
+  color: #ff6800; /* สีแบรนด์ */
+  padding: 10px 20px;
+  border: 1px solid #ff6800;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.back-btn:hover,
+.save-btn:hover {
+  background-color: #ff6800;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(255, 104, 0, 0.2);
+}
+
+.back-btn:active,
+.save-btn:active {
+  background-color: #cc5500;
+  color: #ffffff;
+}
+
+/* Form Section Layout */
+.form-section {
+  margin-top: 20px;
+  padding: 20px;
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.form-section h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #ff6800; /* สีแบรนด์ */
+  margin-bottom: 10px;
+  border-bottom: 2px solid #ffd1b3; /* สีอ่อน */
+  padding-bottom: 5px;
+}
+
+/* Footer Section */
+.footer {
+  text-align: center;
+  margin-top: 30px;
+  font-size: 0.9rem;
+  color: #777;
+  border-top: 1px solid #ddd;
+  padding-top: 10px;
+}

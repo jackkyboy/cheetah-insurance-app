@@ -1,0 +1,42 @@
+.partner-addons {
+    margin-top: 30px;
+  }
+  
+  .add-on-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .add-on-item {
+    margin-bottom: 15px;
+    padding: 15px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .add-on-info h4 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #333;
+  }
+  
+  .add-on-info p {
+    margin: 5px 0;
+  }
+  
+  .btn-selected {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .btn-coupon {
+    margin: 5px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 6px;
+  }
+  

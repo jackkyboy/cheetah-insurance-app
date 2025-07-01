@@ -1,0 +1,227 @@
+/*/Users/apichet/Downloads/cheetah-insurance-app/src/assets/styles/SearchResults.css*/
+/* ========== RESULTS CONTAINER ========== */
+.results-container {
+  margin: 20px auto;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  max-width: 1200px;
+  font-family: "Arial", sans-serif;
+}
+
+/* ========== GRID LAYOUT ========== */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* ปรับขนาดการ์ดให้เหมาะสม */
+  gap: 16px; /* เพิ่มระยะห่างระหว่างการ์ด */
+  justify-items: center;
+  margin-top: 20px;
+}
+
+/* ========== CARD DESIGN ========== */
+.card {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 10px; /* ขอบโค้งเพิ่มขึ้น */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* เพิ่มเงาให้เด่นชัด */
+  padding: 16px; /* เพิ่ม Padding */
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  max-width: 220px; /* ปรับขนาดการ์ด */
+  overflow: hidden; /* ป้องกันการล้นของเนื้อหา */
+}
+
+.card:hover {
+  transform: translateY(-8px); /* ขยับการ์ดขึ้นเล็กน้อย */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* เพิ่มเงาเมื่อ hover */
+}
+
+.card h3 {
+  font-size: 1rem; /* ขนาดเหมาะสม */
+  color: #ff5722;
+  margin: 12px 0; /* เพิ่มระยะห่าง */
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.card p {
+  font-size: 0.85rem; /* อ่านง่ายขึ้น */
+  color: #555;
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+
+/* ปุ่มภายในการ์ด */
+.card button {
+  background-color: #4caf50;
+  color: #ffffff;
+  border: none;
+  padding: 10px 16px; /* เพิ่มขนาดปุ่ม */
+  border-radius: 8px; /* มุมโค้งให้ดูทันสมัย */
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card button:hover {
+  background-color: #388e3c;
+  transform: translateY(-3px); /* ขยับปุ่มขึ้นเล็กน้อย */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* เพิ่มเงาเมื่อ hover */
+}
+
+/* ========== COMPANY LOGO ========== */
+.company-logo {
+  max-width: 120px;
+  max-height: 100px; /* เพิ่มขนาดโลโก้ให้ชัดเจนขึ้น */
+  margin: 12px auto;
+  display: block;
+  object-fit: contain;
+  border: 1px solid #eee; /* เส้นขอบบางๆ */
+  border-radius: 6px;
+  background-color: #f9f9f9;
+}
+
+/* ========== PAGINATION ========== */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px; /* เพิ่มระยะห่างระหว่างปุ่ม */
+  margin-top: 20px;
+}
+
+.pagination button {
+  padding: 8px 12px;
+  background-color: #ff5722;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px; /* ขอบโค้งเพิ่มความทันสมัย */
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pagination button:hover {
+  background-color: #e64a19;
+  transform: scale(1.05); /* ขยายปุ่มเล็กน้อย */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* เพิ่มเงาเมื่อ hover */
+}
+
+.pagination .active {
+  background-color: #d84315;
+  font-weight: bold;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2); /* เน้นปุ่ม active */
+}
+
+/* ปุ่มที่ไม่สามารถกดได้ */
+.pagination button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* ========== MEDIA QUERY ========== */
+@media (max-width: 768px) {
+  .card-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* ลดขนาดการ์ด */
+    gap: 12px;
+  }
+
+  .card {
+    max-width: 180px;
+    padding: 12px;
+  }
+
+  .card h3 {
+    font-size: 0.9rem;
+  }
+
+  .card p {
+    font-size: 0.8rem;
+  }
+
+  .card button {
+    font-size: 0.8rem;
+    padding: 8px 10px;
+  }
+
+  .pagination button {
+    font-size: 0.8rem;
+    padding: 8px 10px;
+  }
+
+  .company-logo {
+    max-width: 80px;
+    max-height: 50px;
+  }
+}
+
+
+
+.fallback-warning {
+  background-color: #fff3cd;
+  border-left: 5px solid #ffc107;
+  padding: 16px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+.fallback-warning p {
+  margin: 4px 0;
+}
+
+.fallback-retry-btn {
+  margin-top: 10px;
+  padding: 6px 14px;
+  background-color: #ff9800;
+  border: none;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+
+/* ========== NAVIGATION BUTTONS ========== */
+.navigation-links {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.navigation-btn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin: 0 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.navigation-btn:hover {
+  background-color: #218838;
+  transform: translateY(-3px); /* เพิ่มการเคลื่อนไหว */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* เพิ่มเงา */
+}
+
+/* ✅ ขยายขนาดโลโก้เฉพาะที่อยู่ในการ์ดเท่านั้น */
+.card .company-logo {
+  max-width: 160px !important;
+  max-height: 100px !important;
+  height: auto !important;
+  display: block;
+  margin: 0 auto 12px auto;
+  object-fit: contain;
+  padding: 8px 12px;
+  background-color: #fff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}

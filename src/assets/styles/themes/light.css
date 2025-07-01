@@ -1,0 +1,80 @@
+/* ======================== */
+/* 🌞 LIGHT THEME OVERRIDES */
+/* ======================== */
+
+:root {
+    --bg-color: #ffffff;
+    --text-color: #222222;
+    --primary-color: #3498db;
+    --secondary-color: #f1f1f1;
+    --accent-color: #2980b9;
+    --link-hover: #1d6fa5;
+  }
+  
+  /* ✅ Apply theme */
+  .light-theme,
+  [data-theme="light-theme"] {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+  }
+  
+  /* ✅ Container */
+  .light-theme .container,
+  [data-theme="light-theme"] .container {
+    background: var(--secondary-color);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* ✅ Headers */
+  .light-theme h1, h2, h3, h4,
+  [data-theme="light-theme"] h1, h2, h3, h4 {
+    color: var(--text-color);
+  }
+  
+  /* ✅ Button */
+  .light-theme .btn,
+  [data-theme="light-theme"] .btn {
+    background: var(--primary-color);
+    color: #fff;
+  }
+  
+  .light-theme .btn:hover,
+  [data-theme="light-theme"] .btn:hover {
+    background: var(--accent-color);
+  }
+  
+  /* ✅ Form Fields */
+  .light-theme input,
+  [data-theme="light-theme"] input {
+    background: #fff;
+    border: 1px solid #ccc;
+    color: var(--text-color);
+  }
+  
+  /* ✅ Header */
+  .light-theme .header,
+  [data-theme="light-theme"] .header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #eaeaea;
+  }
+  
+  .light-theme .logo,
+  [data-theme="light-theme"] .logo {
+    color: var(--primary-color);
+  }
+  
+  .light-theme .nav-item .draw-label,
+  [data-theme="light-theme"] .nav-item .draw-label {
+    color: var(--text-color);
+  }
+  
+  .light-theme .nav-item:hover .draw-label,
+  [data-theme="light-theme"] .nav-item:hover .draw-label {
+    color: var(--accent-color);
+  }
+  
+  .light-theme .draw-underline,
+  [data-theme="light-theme"] .draw-underline {
+    background-color: var(--accent-color);
+  }
+  

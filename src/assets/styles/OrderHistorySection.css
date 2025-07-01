@@ -1,0 +1,67 @@
+.order-history-section {
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-family: "Poppins", sans-serif;
+  }
+  
+  .order-history-section h3 {
+    font-size: 1.5rem;
+    color: #e67e22;
+    margin-bottom: 16px;
+  }
+  
+  .order-history-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .order-history-item {
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    border-left: 4px solid #e67e22;
+  }
+  
+  .order-history-item p {
+    margin: 5px 0;
+    color: #333;
+  }
+  
+  .view-order-link {
+    color: #e67e22;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  
+  .view-order-link:hover {
+    color: #d35400;
+  }
+  
+  /* 🌙 DARK THEME OVERRIDES */
+  .dark-theme .order-history-section {
+    background: #2a2a2a;
+    color: var(--text-color-dark);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.06);
+  }
+  
+  .dark-theme .order-history-item {
+    background: #1e1e1e;
+    border-left: 4px solid var(--primary-color-dark);
+  }
+  
+  .dark-theme .order-history-item p {
+    color: #e0e0e0;
+  }
+  
+  .dark-theme .view-order-link {
+    color: var(--link-hover-dark);
+  }
+  
+  .dark-theme .view-order-link:hover {
+    color: var(--accent-color-dark);
+  }
+  

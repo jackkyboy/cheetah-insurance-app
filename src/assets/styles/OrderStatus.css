@@ -1,0 +1,82 @@
+/*/Users/apichet/Downloads/cheetah-insurance-app/src/assets/styles/OrderStatus.css*/
+/* OrderStatus.css */
+
+/* General Page Layout */
+.order-status-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(to bottom, #f9f9f9, #ffffff);
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  
+  /* Page Header */
+  .order-status-page h2 {
+    color: #ff704d;
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ffa726;
+    padding-bottom: 5px;
+    letter-spacing: 1px;
+  }
+  
+  /* Text Styling */
+  .order-status-page p {
+    color: #333;
+    font-size: 1rem;
+    margin: 10px 0;
+    line-height: 1.6;
+  }
+  
+  .order-status-page p strong {
+    color: #ff704d;
+    font-weight: bold;
+  }
+  
+  /* Loading and Error Messages */
+  .order-status-page .loading {
+    text-align: center;
+    color: #ffa726;
+    font-size: 1.2rem;
+  }
+  
+  .order-status-page .error {
+    text-align: center;
+    color: #d32f2f;
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+  
+  /* Smooth Fade-in Animation */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Mobile Responsiveness */
+  @media (max-width: 768px) {
+    .order-status-page {
+      padding: 15px;
+    }
+  
+    .order-status-page h2 {
+      font-size: 1.5rem;
+    }
+  
+    .order-status-page p {
+      font-size: 0.9rem;
+    }
+  }
+  

@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cheetah-backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .               # 👈 ใช้ root เป็น build context
+      dockerfile: frontend.Dockerfile  # 👈 ใช้ Dockerfile ที่ root หรือเปลี่ยนชื่อใหม่
+    container_name: cheetah-frontend
+    ports:
+      - "3000:80"
+    environment:
+      - REACT_APP_API_BASE_URL=http://localhost:5000
+    restart: unless-stopped

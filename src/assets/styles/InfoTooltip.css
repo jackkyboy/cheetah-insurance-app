@@ -1,0 +1,145 @@
+/* src/assets/styles/InfoTooltip.css */
+/* src/assets/styles/InfoTooltip.css */
+.info-tooltip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Info icon */
+.info-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background-color: #1e90ff;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.info-icon:hover {
+  transform: scale(1.1);
+  background-color: #0066cc;
+}
+
+/* Tooltip block positioning */
+.tooltip-content {
+  position: absolute;
+  z-index: 1000;
+  min-width: 220px;
+  max-width: 260px;
+  background-color: #fff;
+  color: #333;
+  padding: 12px 14px;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  text-align: left;
+  font-size: 0.9rem;
+  white-space: normal;
+  animation: fadeIn 0.25s ease-out;
+}
+
+/* Tooltip arrow */
+.tooltip-arrow {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== Positions ===== */
+
+/* TOP */
+.tooltip-top .tooltip-content {
+  bottom: 130%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.tooltip-top .tooltip-arrow {
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) rotate(0deg);
+}
+
+/* BOTTOM */
+.tooltip-bottom .tooltip-content {
+  top: 130%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.tooltip-bottom .tooltip-arrow {
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) rotate(180deg);
+}
+
+/* LEFT */
+.tooltip-left .tooltip-content {
+  right: 130%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.tooltip-left .tooltip-arrow {
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%) rotate(-90deg);
+}
+
+/* RIGHT */
+.tooltip-right .tooltip-content {
+  left: 130%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.tooltip-right .tooltip-arrow {
+  left: -6px;
+  top: 50%;
+  transform: translateY(-50%) rotate(90deg);
+}
+
+/* Tooltip content style */
+.tooltip-content h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: #ff6700;
+  font-weight: bold;
+}
+.tooltip-content p {
+  margin: 6px 0 0;
+  color: #555;
+  line-height: 1.5;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Mobile fallback */
+@media (max-width: 480px) {
+  .tooltip-content {
+    font-size: 0.85rem;
+    min-width: 180px;
+    max-width: 90vw;
+  }
+
+  .info-icon {
+    width: 20px;
+    height: 20px;
+  }
+}

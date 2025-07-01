@@ -1,0 +1,322 @@
+/* /Users/apichet/Downloads/cheetah-insurance-app/src/assets/styles/Login.css หน้าหลักของ Login */
+/* /Users/apichet/Downloads/cheetah-insurance-app/src/assets/styles/Login.css หน้าหลักของ Login */
+/* ✅ LOGIN PAGE - ISOLATED SCOPE /
+/ File: /src/assets/styles/Login.css */
+
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100vw;
+  background: linear-gradient(135deg, #E67E22 10%, #F5CBA7 90%);
+  font-family: 'Poppins', sans-serif;
+  padding: 20px;
+  overflow: hidden;
+  }
+  
+  .login-page .login-container {
+  display: flex;
+  max-width: 850px;
+  width: 90%;
+  height: 550px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  position: relative;
+  }
+  
+  .login-page .back-home-btn {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: rgba(255, 255, 255, 0.3);
+  padding: 8px 12px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #8E3B00;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease-in-out;
+  }
+  
+  .login-page .back-home-btn:hover {
+  background: rgba(255, 255, 255, 0.5);
+  color: #5E2700;
+  }
+  
+  .login-page .form-panel {
+  width: 50%;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  }
+  
+  .login-page .form-panel h2 {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #D35400;
+  text-transform: uppercase;
+  margin-bottom: 15px;
+  position: relative;
+  }
+  
+  .login-page .form-panel h2::after {
+  content: "";
+  display: block;
+  width: 80px;
+  height: 4px;
+  background: #D35400;
+  margin: 10px auto;
+  border-radius: 2px;
+  }
+  
+  .login-page .input-box {
+  position: relative;
+  margin: 15px 0;
+  width: 100%;
+  }
+  
+  .login-page .input-box input {
+  width: 100%;
+  padding: 12px 20px;
+  background: #F2F2F2;
+  border-radius: 8px;
+  border: 1px solid rgba(230, 126, 34, 0.5);
+  outline: none;
+  font-size: 1rem;
+  transition: all 0.3s ease-in-out;
+  }
+  
+  .login-page .input-box input:focus {
+  border: 1px solid #B34700;
+  box-shadow: 0 0 8px rgba(179, 71, 0, 0.5);
+  }
+  
+  .login-page .input-box i {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  color: #D35400;
+  }
+  
+  .login-page .btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #E67E22, #D35400);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 10px rgba(211, 84, 0, 0.3);
+  margin-top: 15px;
+  }
+  
+  .login-page .btn:hover {
+  background: linear-gradient(135deg, #D35400, #B34700);
+  box-shadow: 0 6px 12px rgba(211, 84, 0, 0.5);
+  }
+  
+  .login-page .btn:active {
+  transform: scale(0.96);
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.3);
+  }
+  
+  .login-page .forgot-password {
+  display: block;
+  width: auto;
+  padding: 10px 20px;
+  background: white;
+  color: #D35400;
+  border: 1px solid #D35400;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 3px 5px rgba(211, 84, 0, 0.2);
+  margin: 15px auto 0;
+  }
+  
+  .login-page .forgot-password:hover {
+  background: #D35400;
+  color: white;
+  box-shadow: 0 5px 10px rgba(211, 84, 0, 0.5);
+  }
+  
+  .login-page .toggle-box {
+  width: 50%;
+  background: #E67E22;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 40px;
+  }
+  
+  .login-page .toggle-box h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
+  color: #ffffff;
+  }
+  
+  .login-page .toggle-box .toggle-btn {
+  width: 80%;
+  padding: 12px;
+  background: linear-gradient(135deg, #E67E22, #c3a38d);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 10px rgba(211, 84, 0, 0.3);
+  margin-top: 20px;
+  }
+  
+  .login-page .toggle-box .toggle-btn:active {
+  transform: scale(0.96);
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.3);
+  }
+  
+  .login-page .toggle-box .toggle-btn:hover {
+  background: linear-gradient(135deg, #facdaf, #B34700);
+  box-shadow: 0 6px 12px rgba(211, 84, 0, 0.5);
+  }
+  
+  /* 🧪 Layout Fix */
+  .login-page .form-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  }
+  
+  .login-page .input-box {
+  width: 100%;
+  margin-bottom: 15px;
+  }
+  
+  /* ============================
+  🔁 RESPONSIVE STYLES
+  =============================== */
+  
+  @media screen and (max-width: 1024px) {
+  .login-page .login-container {
+  width: 90%;
+  height: auto;
+  flex-direction: column;
+  }
+  
+  .login-page .form-panel,
+  .login-page .toggle-box {
+  width: 100%;
+  height: auto;
+  padding: 40px;
+  }
+  
+  .login-page .toggle-box {
+  border-radius: 0 0 20px 20px;
+  }
+  }
+  
+  @media screen and (max-width: 768px) {
+  .login-page .login-container {
+  width: 95%;
+  height: auto;
+  flex-direction: column;
+  padding: 20px;
+  }
+  
+  .login-page .form-panel,
+  .login-page .toggle-box {
+  width: 100%;
+  height: auto;
+  padding: 30px;
+  }
+  
+  .login-page .form-panel h2,
+  .login-page .toggle-box h1 {
+  font-size: 1.6rem;
+  }
+  
+  .login-page .btn {
+  font-size: 0.9rem;
+  padding: 10px;
+  }
+  
+  .login-page .input-box input {
+  font-size: 0.9rem;
+  padding: 10px;
+  }
+  }
+  
+  @media screen and (max-width: 430px) {
+  .login-page .login-container {
+  width: 100%;
+  height: auto;
+  padding: 15px;
+  }
+  
+  .login-page .form-panel,
+  .login-page .toggle-box {
+  width: 100%;
+  height: auto;
+  padding: 25px;
+  }
+  
+  .login-page .form-panel h2,
+  .login-page .toggle-box h1 {
+  font-size: 1.5rem;
+  }
+  
+  .login-page .btn {
+  font-size: 0.85rem;
+  padding: 10px;
+  }
+  
+  .login-page .input-box input {
+  font-size: 0.85rem;
+  padding: 10px;
+  }
+  }
+  
+  @media screen and (max-width: 375px) {
+  .login-page .login-container {
+  width: 100%;
+  padding: 10px;
+  }
+  
+  .login-page .form-panel,
+  .login-page .toggle-box {
+  padding: 20px;
+  }
+  
+  .login-page .form-panel h2,
+  .login-page .toggle-box h1 {
+  font-size: 1.4rem;
+  }
+  
+  .login-page .btn {
+  font-size: 0.8rem;
+  padding: 8px;
+  }
+  
+  .login-page .input-box input {
+  font-size: 0.8rem;
+  padding: 8px;
+  }
+  }

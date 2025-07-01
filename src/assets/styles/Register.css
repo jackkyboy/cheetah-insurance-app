@@ -1,0 +1,146 @@
+/* 🌟 แก้พื้นหลังให้เต็มหน้าจอ ไม่มีขอบขาวโผล่ */
+/* 🌟 แก้พื้นหลังให้เต็มหน้าจอ ไม่มีขอบขาวโผล่ */
+.register-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100vw;
+  background: linear-gradient(135deg, #E67E22 10%, #F5CBA7 90%);
+  font-family: 'Poppins', sans-serif;
+  padding: 20px;
+  overflow: hidden;
+}
+
+/* 🌟 ปรับ Container ให้เหมือน Login */
+.register-container {
+  display: flex;
+  max-width: 700px; /* ✅ ปรับให้ไม่กว้างเกินไป */
+  width: 90%;
+  height: auto;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  padding: 40px;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 🌟 ฝั่งแบบฟอร์ม */
+.register-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 15px;
+}
+
+.register-form h2 {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #D35400;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.register-form h2::after {
+  content: "";
+  display: block;
+  width: 80px;
+  height: 4px;
+  background: #D35400;
+  margin: 10px auto;
+  border-radius: 2px;
+}
+
+/* 🌟 กล่องใส่ Input */
+.register-input {
+  position: relative;
+  width: 100%;
+}
+
+.register-input input {
+  width: 100%;
+  max-width: 350px; /* ✅ ไม่ให้ input กว้างเกินไป */
+  padding: 12px 15px;
+  background: #F2F2F2;
+  border-radius: 8px;
+  border: 1px solid rgba(230, 126, 34, 0.5);
+  outline: none;
+  font-size: 1rem;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.register-input input:focus {
+  border: 1px solid #B34700;
+  box-shadow: 0 0 8px rgba(179, 71, 0, 0.5);
+}
+
+/* 🌟 ปุ่ม Register */
+.register-btn {
+  width: 100%;
+  max-width: 350px;
+  padding: 12px;
+  background: linear-gradient(135deg, #E67E22, #D35400);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 10px rgba(211, 84, 0, 0.3);
+  margin-top: 10px;
+}
+
+.register-btn:hover {
+  background: linear-gradient(135deg, #D35400, #B34700);
+  box-shadow: 0 6px 12px rgba(211, 84, 0, 0.5);
+}
+
+/* ✅ ปุ่ม Active ตอนกด */
+.register-btn:active {
+  transform: scale(0.96);
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* 🌟 ปุ่ม Back to Login */
+.back-login-btn {
+  display: block;
+  width: 100%;
+  max-width: 350px;
+  padding: 10px;
+  background: white;
+  color: #D35400;
+  border: 1px solid #D35400;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 3px 5px rgba(211, 84, 0, 0.2);
+  margin-top: 10px;
+}
+
+.back-login-btn:hover {
+  background: #D35400;
+  color: white;
+  box-shadow: 0 5px 10px rgba(211, 84, 0, 0.5);
+}
+
+/* 🌟 Layout Fix - ปรับระยะห่างปุ่มทั้งหมด */
+.register-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.register-input {
+  width: 100%;
+  margin-bottom: 10px;
+}

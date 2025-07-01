@@ -1,0 +1,180 @@
+/* /Users/apichet/Downloads/cheetah-insurance-app/src/assets/styles/chatbot.css */
+/* ✅ Floating Chatbot Toggle */
+#chatbot-toggle {
+    position: fixed;
+    bottom: 30px;
+    right: 25px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: #f77f00;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000; /* ✅ อยู่เหนือเนื้อหา */
+}
+
+
+#chatbot-toggle:hover {
+    background-color: #d97706;
+    transform: scale(1.1);
+}
+
+/* ✅ Chatbot Container */
+#chatbot-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9998;  /* ✅ น้อยกว่า ChatAgent */
+  }
+  
+  #chatbot-box {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 350px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+
+/* ✅ Chatbot Header */
+.chatbot-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 55px;
+    background-color: #f77f00;
+    color: white;
+    font-weight: bold;
+    padding: 0 15px;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+/* ✅ Close Button */
+.chatbot-close-btn {
+    background-color: #d9534f;
+    color: white;
+    border: none;
+    font-size: 14px;
+    padding: 5px 10px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    width: 40px;
+    height: 30px;
+    text-align: center;
+}
+
+.chatbot-close-btn:hover {
+    background-color: #c9302c;
+}
+
+/* ✅ Chat Messages */
+.chatbox {
+    width: 100%;
+    height: 400px;
+    overflow-y: auto;
+    background-color: #f9f9f9;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid #ddd;
+    scroll-behavior: smooth;
+}
+
+/* ✅ Messages */
+.message {
+    max-width: 80%;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    border-radius: 20px;
+    font-size: 14px;
+    line-height: 1.4;
+    word-wrap: break-word;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.message.bot {
+    background-color: #e0e0e0;
+    align-self: flex-start;
+    color: #333;
+}
+
+.message.user {
+    background-color: #f77f00;
+    color: white;
+    align-self: flex-end;
+}
+
+/* ✅ Input Section */
+.chatbox-input {
+    width: 100%;
+    height: 55px;
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background-color: white;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+.chatbox-input-field {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    outline: none;
+    font-size: 14px;
+}
+
+.chatbox-send-btn {
+    margin-left: 10px;
+    background-color: #f77f00;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+}
+
+.chatbox-send-btn:hover {
+    background-color: #d97706;
+}
+
+/* ✅ Animation */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ✅ Responsive for Mobile */
+@media (max-width: 400px) {
+    #chatbot-box {
+        width: 95%;
+        right: 10px;
+        bottom: 80px;
+    }
+
+    .chatbox {
+        height: 350px;
+    }
+}

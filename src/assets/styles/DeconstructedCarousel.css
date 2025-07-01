@@ -1,0 +1,296 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap");
+
+:root {
+  --bg-color: #f1f1f1;
+  --card-width: 300px;
+  --card-height: 400px;
+  --black: #080808;
+  --white: #fafafa;
+  --accent: #ff2d55;
+  --grid-color: rgba(0, 0, 0, 0.08);
+  --frame-color: rgba(8, 8, 8, 0.8);
+  --transition-slow: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-fast: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  background-color: var(--bg-color);
+  color: var(--black);
+  overflow-x: hidden;
+}
+
+/* ===== Carousel ===== */
+.carousel {
+    position: relative;
+    width: 100%;
+    max-width: 1400px;
+    margin: auto;
+    padding: 5vh 0;
+  
+    /* เพิ่มตรงนี้: */
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+
+.carousel-track {
+  display: flex;
+  gap: 40px;
+  padding: 40px 0;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+
+.deconstructed-card {
+    position: relative;
+    width: var(--card-width);
+    height: var(--card-height);
+    scroll-snap-align: center; /* เปลี่ยนจาก start → center เพื่อความสมดุล */
+  
+    flex-shrink: 0;
+    transition: transform 0.6s ease;
+    transform-style: preserve-3d;
+    transform-origin: center center;
+    cursor: pointer;
+    will-change: transform;
+  }
+  
+  /* เพิ่มเอฟเฟกต์ tilt เมื่อ hover */
+  .deconstructed-card:hover {
+    transform: scale(1.03) rotateY(1.5deg);
+    z-index: 2;
+  }
+  
+.card-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: transform var(--transition-slow), opacity var(--transition-slow);
+}
+
+.card-image {
+  overflow: hidden;
+  z-index: 1;
+}
+
+.wave-svg {
+  width: 100%;
+  height: 100%;
+  transition: transform 1.2s ease;
+}
+
+.card-frame {
+  z-index: 3;
+  pointer-events: none;
+}
+
+.frame-path {
+  fill: none;
+  stroke: var(--frame-color);
+  stroke-width: 1;
+  stroke-dasharray: 1520;
+  stroke-dashoffset: 1520;
+  transition: stroke-dashoffset 1.5s ease;
+}
+
+.card-content {
+  z-index: 2;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.content-fragment {
+  margin-bottom: 1.5rem;
+}
+.fragment-heading .content-text {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #ffffff; /* ขาวชัดเจน */
+    opacity: 1;
+    transform: translateY(10px);
+    transition: var(--transition-fast);
+  }
+  
+  .fragment-heading .content-subtext {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #ffe6cc; /* เหลืองนวลนิดๆ */
+    opacity: 1;
+    transform: translateY(10px);
+    transition: var(--transition-fast);
+  }
+  
+  .fragment-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .meta-line {
+    width: 40px;
+    height: 1px;
+    background-color: #ffffff; /* เส้นสีขาวตัดพื้นหลัง */
+    transform: scaleX(0.5);
+    transition: var(--transition-fast);
+  }
+  
+  .meta-text {
+    font-family: "Space Mono", monospace;
+    font-size: 0.75rem;
+    color: #eeeeee;
+    opacity: 1;
+    transform: translateX(-5px);
+    transition: var(--transition-fast);
+  }
+  
+  .fragment-body .content-text {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: #fff8e7;
+    opacity: 1;
+  }
+  
+  .fragment-cta {
+    margin-top: auto;
+  }
+  .cta-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    padding: 8px 12px;
+    background-color: #fff0f5; /* pink pastel background */
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 1;
+  }
+  
+  .cta-box {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #ff6b6b; /* Coral Pink for hover fill */
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease-in-out;
+    z-index: 0;
+  }
+  
+  .cta-text {
+    position: relative;
+    font-family: "Space Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #333333; /* readable dark text */
+    transform: translateX(-5px);
+    opacity: 0.9;
+    transition: all 0.3s ease;
+    z-index: 2;
+  }
+  
+  /* ===== Hover Animations ===== */
+  .deconstructed-card:hover .frame-path {
+    stroke-dashoffset: 0;
+  }
+  
+  .deconstructed-card:hover .content-text,
+  .deconstructed-card:hover .content-subtext {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  
+  .deconstructed-card:hover .meta-line {
+    transform: scaleX(1);
+  }
+  
+  .deconstructed-card:hover .meta-text {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  
+  .deconstructed-card:hover .wave-svg {
+    transform: scale(1.05);
+  }
+  
+  .deconstructed-card:hover .cta-text {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  
+  .deconstructed-card:hover .cta-link:hover .cta-box {
+    transform: scaleX(1);
+  }
+  
+  .deconstructed-card:hover .cta-link:hover .cta-text {
+    color: #ffffff;
+  }
+  
+
+/* ===== Controls and Dots ===== */
+.carousel-controls {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.carousel-button {
+  background: var(--black);
+  color: var(--white);
+  border: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.carousel-button:hover {
+  transform: translateY(-2px);
+}
+
+.dots-container {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--black);
+  border-radius: 50%;
+  opacity: 0.3;
+  transition: 0.3s ease;
+  cursor: pointer;
+}
+
+.dot.active {
+  opacity: 1;
+  transform: scale(1.3);
+}
+
+

@@ -1,0 +1,132 @@
+/*/Users/apichet/Downloads/cheetah-insurance-app/src/assets/styles/ReportClaim.css*/
+.report-claim-page {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 25px;
+    background: linear-gradient(to bottom, #fff7eb, #ffe5d1);
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    font-family: 'Arial', sans-serif;
+}
+
+h2 {
+    color: #ff704d;
+    text-align: center;
+    font-size: 1.8em;
+    margin-bottom: 25px;
+    font-weight: bold;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    font-size: 1em;
+    margin-bottom: 8px;
+    color: #444;
+}
+
+input,
+textarea,
+select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1em;
+    font-family: 'Arial', sans-serif;
+    box-sizing: border-box;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+input[type="file"] {
+    border: none;
+    font-size: 0.9em;
+}
+
+button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.submit-btn {
+    background-color: #ff704d;
+    color: white;
+    margin-right: 10px;
+    transition: transform 0.2s ease-in-out;
+}
+
+.submit-btn:hover {
+    background-color: #ff5733;
+    transform: scale(1.05);
+}
+
+.cancel-btn {
+    background-color: #f0f0f0;
+    color: #444;
+}
+
+.cancel-btn:hover {
+    background-color: #ddd;
+    transform: scale(1.05);
+}
+
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.success-message,
+.error-message {
+    text-align: center;
+    font-size: 1em;
+    font-weight: bold;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+}
+
+.success-message {
+    color: #28a745;
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+}
+
+.error-message {
+    color: #dc3545;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+}
+
+.form-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+select {
+    appearance: none;
+    background-color: #fff;
+    background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='16' viewBox='0 0 24 24' width='16' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5H7z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+}
+
+select:focus {
+    outline: none;
+    border-color: #ff704d;
+    box-shadow: 0 0 4px rgba(255, 112, 77, 0.5);
+}

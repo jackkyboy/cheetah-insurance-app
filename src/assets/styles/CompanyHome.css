@@ -1,0 +1,248 @@
+/* ============ Main Layout ============ */
+/* ========== 🌐 Global Reset ========== */
+/* ========== 🌐 Global Layout ========== */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(135deg, #E67E22 10%, #F5CBA7 90%);
+}
+
+/* ========== 🏠 Company Home ========== */
+.company-home {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  align-items: center;
+  padding: 20px;
+}/* ========== 🧢 Header Section ========== */
+.company-header {
+  width: 100%;
+  text-align: center;
+  padding: 20px 0;
+  background: linear-gradient(135deg, #E67E22, #D35400);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.company-header h1 {
+  margin: 0;
+  font-size: 2.4rem;
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.company-header p {
+  margin: 8px 0 0;
+  font-size: 1.1rem;
+  opacity: 0.95;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+/* ========== 🚀 Hero Buttons ========== */
+.hero-buttons {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-gallery {
+  padding: 12px 22px;
+  border-radius: 12px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  text-shadow: none;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* 🟠 CTA Button (สว่างขึ้น) */
+.btn-primary {
+  background: linear-gradient(135deg, #f29c50, #ea5c2b); /* ส้มอ่อน → ส้มเข้ม */
+  color: #ffffff;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(234, 92, 43, 0.25);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #ea5c2b, #c3441f);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(234, 92, 43, 0.3);
+}
+
+/* 🟤 Secondary (อ่อนนุ่ม อ่านง่าย) */
+.btn-secondary {
+  background-color: #fff9f2;
+  color: #ffffff;
+  border: 2px solid #ffa366;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(255, 163, 102, 0.15);
+}
+
+.btn-secondary:hover {
+  background-color: #ffe7d6;
+  color: #b33a00;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(255, 163, 102, 0.25);
+}
+
+/* 🔷 Gallery (สดใสขึ้น) */
+.btn-gallery {
+  background: linear-gradient(135deg, #4da3ff, #1f6fe7); /* ฟ้าอ่อน → น้ำเงิน */
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 3px 10px rgba(31, 111, 231, 0.3);
+}
+
+.btn-gallery:hover {
+  background: linear-gradient(135deg, #1f6fe7, #1453b8);
+  transform: translateY(-1px);
+  box-shadow: 0 5px 14px rgba(31, 111, 231, 0.4);
+}
+
+
+
+/* ========== 🧭 Switch Buttons ========== */
+.insurance-switcher {
+  margin: 30px 0 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.switch-btn {
+  padding: 10px 16px;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  background-color: white;
+  color: #ffffff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.switch-btn.active {
+  background: linear-gradient(135deg, #E67E22, #D35400);
+  color: white;
+  font-weight: 800;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+  -webkit-text-stroke: 0.2px rgba(0, 0, 0, 0.2); /* ✅ stroke บางๆ */
+}
+
+.switch-btn:hover {
+  border-color: #D35400;
+}
+
+
+/* ========== 📋 Form Section ========== */
+.search-section {
+  width: 100%;
+  max-width: 960px;
+  margin: auto;
+}
+
+.form-layout-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 25px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.form-container {
+  flex: 1;
+  min-width: 300px;
+  background-color: #fdf2e9;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.form-container select {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+/* 🎯 Submit Button */
+.submit-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #E67E22, #D35400);
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.submit-btn:hover {
+  background: linear-gradient(135deg, #D35400, #B34700);
+}
+
+/* ========== 🤖 Chat Section ========== */
+#chatbot-container,
+#chat-agent-container {
+  position: fixed;
+  z-index: 9999;
+}
+
+#chatbot-container {
+  bottom: 30px;
+  right: 25px;
+}
+
+#chat-agent-container {
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 10000;
+}
+
+.chat-agent-card {
+  background: white;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 800px;
+  height: 90%;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 768px) {
+  .chat-agent-card {
+    width: 95%;
+    height: 95%;
+  }
+  .insurance-switcher {
+    flex-direction: column;
+    align-items: center;
+  }
+  .hero-buttons {
+    flex-direction: column;
+  }
+}

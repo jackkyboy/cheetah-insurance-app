@@ -1,0 +1,25 @@
+.profile-picture-container {
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .profile-picture-container img {
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border: 2px solid #ddd;
+    margin-bottom: 10px;
+  }
+  
+  .profile-picture-container input {
+    display: block;
+    margin: 0 auto;
+    margin-top: 10px;
+  }
+  
+  .profile-picture-container p {
+    color: #ff9800;
+    font-weight: bold;
+  }
+  

@@ -1,0 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+.fiery-container {
+  position: relative;
+  width: 360px;
+  max-width: 95%;
+  perspective: 1200px;
+  transform-style: preserve-3d;
+  margin: 30px auto;
+}
+
+.fiery-card {
+  background: rgba(30, 15, 5, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 28px;
+  padding: 24px 22px;
+  color: #ECECEC;
+  box-shadow: 0 12px 35px rgba(0,0,0,0.65), 0 0 0 1px rgba(255, 160, 100, 0.2) inset;
+  transform-style: preserve-3d;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.fiery-card[data-tilt] {
+  will-change: transform;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #FAFAFA;
+  margin-bottom: 8px;
+}
+
+.card-price {
+  font-size: 2.3rem;
+  font-weight: 800;
+  color: #FFF;
+  margin-bottom: 12px;
+}
+
+.card-price .currency {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #FDBA74;
+}
+
+.card-price .period {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #D1D5DB;
+}
+
+.card-description {
+  font-size: 0.95rem;
+  color: #B0B6BF;
+  margin-bottom: 18px;
+  line-height: 1.6;
+}
+
+.features-list {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 24px;
+}
+
+.features-list li {
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+  color: #D1D5DB;
+}
+
+.rotating-disc-svg {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  animation: spin 4s linear infinite;
+}
+
+.rotating-disc-svg circle {
+  stroke: #FDBA74;
+  stroke-width: 2;
+  stroke-dasharray: 8 4;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.cta-button {
+  background-color: rgba(255, 150, 80, 0.25);
+  backdrop-filter: blur(8px);
+  color: #FFFFFF;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 14px 0;
+  width: 100%;
+  border: 1px solid rgba(255, 190, 120, 0.3);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(255, 100, 0, 0.25);
+  text-transform: uppercase;
+}
+
+.cta-button:hover {
+  background-color: rgba(255, 160, 90, 0.40);
+  border-color: rgba(255, 200, 140, 0.4);
+  transform: translateY(-2px) scale(1.03);
+}
+
+.cta-button:active {
+  transform: translateY(0px) scale(0.98);
+  background-color: rgba(255, 140, 70, 0.45);
+}
+
+.energy-canvas {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  pointer-events: none;
+  filter: blur(2px) brightness(1.2) saturate(1.3);
+}

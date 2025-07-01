@@ -1,0 +1,120 @@
+/* ===== 💎 Custom Font/Users/apichet/Downloads/cheetah-insurance-app/src/assets/styles/Header.css ===== */ 
+/* ===== 💎 Custom Font ===== */
+/* ===== 💎 Custom Font ===== */
+@font-face {
+    font-family: 'PP Neue Montreal';
+    src: url('https://cdn.prod.website-files.com/6819ed8312518f61b84824df/6819ed8312518f61b84825ba_PPNeueMontreal-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  /* ===== 🌐 Header Layout ===== */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background-color: #fefaee;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    font-family: 'PP Neue Montreal', 'Poppins', sans-serif;
+  }
+  
+  /* ===== 🔖 Logo ===== */
+  .logo {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #e55050;
+    cursor: pointer;
+    user-select: none;
+    transition: opacity 0.3s ease;
+  }
+  
+  .logo:hover {
+    opacity: 0.8;
+  }
+  
+  /* ===== 🔗 Navigation ===== */
+  .nav-links {
+    display: flex;
+    gap: 3rem; /* ✅ เพิ่มระยะห่างระหว่างเมนู */
+    align-items: center;
+  }
+  
+  /* ===== 🔗 Menu Item Container ===== */
+  .nav-item {
+    padding: 6px 12px;      /* ✅ เพิ่ม padding ให้แต่ละปุ่ม */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: transform 0.2s ease;
+  }
+  
+  .nav-item:hover {
+    transform: translateY(-1px);
+  }
+  
+  /* ===== 🔗 Underline Effect (FancyUnderline inside) ===== */
+  .nav-link {
+    position: relative;
+    font-size: 1rem;
+    color: #340824;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0%;
+    height: 3px;
+    background-color: #e55050;
+    transition: width 0.3s ease;
+  }
+  
+  .nav-link:hover::after {
+    width: 100%;
+  }
+  
+  .nav-link:hover {
+    color: #e55050;
+  }
+  
+
+
+  /* เพิ่มใน /assets/styles/Header.css */
+.btn-toggle {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    transition: color 0.3s ease;
+    color: #555;
+  }
+  
+  .btn-toggle:hover {
+    color: #e55050;
+  }
+  
+
+  /* ===== 🌗 Toggle Theme Button ===== */
+.btn-toggle {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.25rem;
+    color: #e55050;
+    transition: transform 0.3s ease;
+    padding: 4px;
+  }
+  
+  .btn-toggle:hover {
+    transform: rotate(20deg);
+    color: #d93636;
+  }
+  

@@ -1,0 +1,144 @@
+/* ========== CARD CONTAINER ========== */
+/* ========== CARD CONTAINER ========== */
+.package-card {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  padding: 20px;
+  text-align: center;
+  max-width: 280px; /* ควบคุมขนาดของการ์ด */
+  margin: auto; /* ตั้งให้อยู่ตรงกลาง */
+}
+
+.package-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ========== LOGO CONTAINER ========== */
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80px;
+  margin-bottom: 15px;
+  background-color: #f9f9f9;
+  border-radius: 8px; /* ให้ขอบมน */
+  border: 1px solid #ddd; /* เพิ่มขอบโลโก้ */
+  padding: 10px;
+}
+
+.company-logo {
+  max-width: 100%;
+  max-height: 60px;
+  object-fit: contain;
+}
+
+/* ========== CARD TITLE ========== */
+.package-title {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #ff5722;
+  margin-bottom: 10px;
+  text-transform: uppercase; /* ตัวอักษรใหญ่ทั้งหมด */
+}
+
+/* ========== PACKAGE DETAILS ========== */
+.package-details {
+  font-size: 0.95rem;
+  color: #555;
+  line-height: 1.5;
+  margin-bottom: 15px;
+}
+
+.package-details p {
+  margin: 5px 0;
+}
+
+.package-details strong {
+  color: #333;
+}
+
+/* ========== BUTTONS ========== */
+.card-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.card-buttons .btn {
+  padding: 10px 15px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Primary Button */
+.card-buttons .btn-primary {
+  background-color: #4caf50;
+  color: #ffffff;
+}
+
+.card-buttons .btn-primary:hover {
+  background-color: #388e3c;
+  transform: scale(1.05);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Secondary Button */
+.card-buttons .btn-secondary {
+  background-color: #ff7043;
+  color: #ffffff;
+}
+
+.card-buttons .btn-secondary:hover {
+  background-color: #e64a19;
+  transform: scale(1.05);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* ========== MEDIA QUERY ========== */
+@media (max-width: 768px) {
+  .package-card {
+    padding: 15px;
+  }
+
+  .package-title {
+    font-size: 1.2rem;
+  }
+
+  .package-details {
+    font-size: 0.85rem;
+  }
+
+  .card-buttons .btn {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+}
+
+/* ========== UTILITY STYLES ========== */
+/* เผื่อมีการเพิ่มคลาสการจัดการ */
+.text-center {
+  text-align: center;
+}
+
+.font-bold {
+  font-weight: bold;
+}
+
+.mt-10 {
+  margin-top: 10px;
+}
+
+.mb-10 {
+  margin-bottom: 10px;
+}
+

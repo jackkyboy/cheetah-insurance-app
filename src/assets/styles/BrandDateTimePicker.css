@@ -1,0 +1,89 @@
+/* BrandDateTimePicker.css */
+
+.app-container {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  max-width: 400px;
+  margin: auto;
+}
+
+.datepicker,
+.timepicker {
+  margin: 20px 0;
+}
+
+.navigation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.nav-button {
+  background: #f0f0f0;
+  border: none;
+  padding: 10px;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.nav-button:disabled {
+  background: #ddd;
+  cursor: not-allowed;
+}
+
+.date-display {
+  margin: 0 15px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.time-display {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+  margin: 10px 0;
+}
+
+.time-adjust {
+  background: #f0f0f0;
+  border: none;
+  padding: 10px 20px;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin: 0 5px;
+}
+
+.time-text {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0 10px;
+}
+
+.buttons-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.cancel-button,
+.save-button {
+  background-color: #007bff;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.cancel-button {
+  background-color: #ff4d4d;
+}
+
+.cancel-button:hover,
+.save-button:hover {
+  opacity: 0.9;
+}

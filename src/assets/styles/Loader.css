@@ -1,0 +1,54 @@
+/* src/assets/styles/Loader.css */
+/* src/assets/styles/Loader.css */
+/* src/assets/styles/Loader.css */
+
+.loader-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 0;
+}
+
+.loader {
+  width: 60px;
+  height: 60px;
+  animation: rotate 1s linear infinite;
+}
+
+.loader-circle {
+  stroke: #ff6700;
+  stroke-linecap: round;
+  stroke-dasharray: 90, 150;
+  stroke-dashoffset: 0;
+  transform-origin: center;
+  animation: dash 1.5s ease-in-out infinite;
+}
+
+/* หมุนรอบตัว */
+@keyframes rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* stroke วนรอบ */
+@keyframes dash {
+  0% {
+    stroke-dasharray: 1, 150;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 90, 150;
+    stroke-dashoffset: -35;
+  }
+  100% {
+    stroke-dasharray: 90, 150;
+    stroke-dashoffset: -124;
+  }
+}
+
+.loader-text {
+  margin-top: 10px;
+  font-size: 1rem;
+  color: #888;
+}

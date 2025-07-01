@@ -1,0 +1,123 @@
+/*/Users/apichet/Downloads/cheetah-insurance-app/src/assets/styles/FiltersBar.css*/
+/* ========== Filters Bar Styles ========== */
+/* Filters Bar */
+/* ========== Filters Bar Styles ========== */
+/* ✅ Filters Bar */
+/* ========== Filters Bar Styles ========== */
+.filters-bar {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
+  margin-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* ✅ Title */
+.filters-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ff5722;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+/* ✅ Grid Layout สำหรับ Filters */
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+/* ✅ Form Group Styling */
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 6px;
+}
+
+.form-group select {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  background-color: #ffffff;
+  color: #444;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group select:focus {
+  border-color: #ff7043;
+  box-shadow: 0 0 6px rgba(255, 112, 67, 0.3);
+  outline: none;
+}
+
+/* ✅ ปุ่มใช้ฟิลเตอร์ */
+.apply-filters-btn {
+  background: linear-gradient(to right, #ff5722, #ff7043);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 14px 24px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  margin-top: 10px;
+}
+
+.apply-filters-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(255, 87, 34, 0.3);
+  background: linear-gradient(to right, #e64a19, #ff6e40);
+}
+
+/* ✅ ปุ่มล้างค่า */
+.clear-filters-btn {
+  background: transparent;
+  color: #999;
+  border: 1px dashed #ccc;
+  border-radius: 12px;
+  font-size: 14px;
+  padding: 10px 20px;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: all 0.2s ease;
+}
+
+.clear-filters-btn:hover {
+  border-color: #ff5722;
+  color: #ff5722;
+}
+
+/* ✅ Button Group */
+.button-group {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+/* ✅ Responsive */
+@media (max-width: 768px) {
+  .filters-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .apply-filters-btn,
+  .clear-filters-btn {
+    width: 100%;
+    margin-left: 0;
+  }
+}

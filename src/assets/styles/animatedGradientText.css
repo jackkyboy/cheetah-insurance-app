@@ -1,0 +1,44 @@
+/* Animated Gradient Variables for Cheetah Brand /Users/apichet/Downloads/cheetah-insurance-app/src/assets/styles/animatedGradientText.css*/
+/* Animated Gradient Variables for Cheetah Brand */
+/* File: /src/assets/styles/animatedGradientText.css */
+
+/* /src/assets/styles/animatedGradientText.css */
+@property --color-1 {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: hsl(24, 100%, 65%);
+  }
+  
+  @property --color-2 {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: hsl(39, 100%, 70%);
+  }
+  
+  @keyframes gradient-change {
+    0% {
+      --color-1: hsl(24, 100%, 65%);
+      --color-2: hsl(39, 100%, 70%);
+    }
+    50% {
+      --color-1: hsl(16, 100%, 60%);
+      --color-2: hsl(46, 100%, 75%);
+    }
+    100% {
+      --color-1: hsl(24, 100%, 65%);
+      --color-2: hsl(39, 100%, 70%);
+    }
+  }
+  
+  .gradient-text {
+    animation: gradient-change 6s ease-in-out infinite;
+  
+    background: linear-gradient(to right in oklch, var(--color-1), var(--color-2));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  
+    font-weight: bold;
+  }
+  

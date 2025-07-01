@@ -1,0 +1,43 @@
+/* ======================== */
+/* 🎨 BASE THEME STYLES     */
+/* ======================== */
+
+:root {
+    --font-family: "Inter", sans-serif;
+    --font-size: 16px;
+    --transition-speed: 0.3s ease;
+  }
+  
+  /* ✅ Global Reset */
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: var(--font-family);
+    font-size: var(--font-size);
+    transition: background var(--transition-speed), color var(--transition-speed);
+    line-height: 1.6;
+  }
+  
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  /* ✅ Button Basic Style */
+  button {
+    border: none;
+    cursor: pointer;
+    transition: background var(--transition-speed), color var(--transition-speed);
+  }
+  
+  /* ✅ Utility Classes */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+  }
+  

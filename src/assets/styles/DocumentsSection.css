@@ -1,0 +1,107 @@
+/* 📦 กล่องแสดงรายการเอกสาร */
+.documents-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 30px 0;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* 📋 ตารางเอกสาร */
+.documents-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: "Inter", "Poppins", sans-serif;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* 🧾 ส่วนหัวของตาราง */
+.documents-table thead {
+  background-color: #ff704d; /* พาสเทลส้ม */
+}
+
+.documents-table th {
+  color: #ffffff;
+  padding: 14px;
+  text-align: center;
+  font-size: 1rem;
+  border-bottom: 2px solid #ffa07a;
+}
+
+/* 📄 แถวข้อมูล */
+.documents-table td {
+  background-color: #fff8f5;
+  padding: 12px 14px;
+  border-bottom: 1px solid #ffd9cc;
+  font-size: 0.92rem;
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* 🔁 สีแถวสลับ */
+.documents-table tr:nth-child(even) td {
+  background-color: #fff1eb;
+}
+
+/* 🚫 ลบเส้นขอบล่างของแถวสุดท้าย */
+.documents-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* 📎 Input สำหรับอัปโหลดไฟล์ */
+.documents-table input[type="file"] {
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+/* 🔘 ปุ่มทั่วไป */
+.documents-table button {
+  margin: 4px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* 👁‍🗨 ปุ่มดูเอกสาร */
+.documents-table button:first-of-type {
+  background-color: #4caf50;
+  color: #ffffff;
+}
+
+.documents-table button:first-of-type:hover {
+  background-color: #388e3c;
+}
+
+/* 🗑️ ปุ่มลบ */
+.documents-table button:last-of-type {
+  background-color: #ef5350;
+  color: #ffffff;
+}
+
+.documents-table button:last-of-type:hover {
+  background-color: #c62828;
+}
+
+/* ❗ ข้อความแจ้ง error */
+.error-message {
+  color: red;
+  margin-bottom: 10px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* 🚫 ปรับความทึบแถวที่ถูก disable */
+.documents-table tr[style*="opacity: 0.5"] td {
+  background-color: #fdf1f1 !important;
+  color: #999999;
+}

@@ -1,0 +1,44 @@
+.package-list {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  /* ✅ Card สวยงาม พร้อม Hover Effect */
+  .package-card {
+    background: linear-gradient(135deg, #fdf2e9, #fae5d3);
+    border-left: 4px solid #e67e22;
+    padding: 14px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    color: #333;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .package-card:hover {
+    transform: scale(1.01);
+    box-shadow: 0 4px 8px rgba(230, 126, 34, 0.3);
+  }
+  
+  /* ✅ เบี้ย/ประเภท */
+  .package-card p {
+    margin: 4px 0;
+    line-height: 1.4;
+  }
+  
+  /* ✅ คำอธิบายแพ็กเกจ */
+  .pkg-desc {
+    font-style: italic;
+    color: #555;
+    margin-top: 6px;
+  }
+  
+  /* ✅ คำเตือนเบี้ยเทียม */
+  .warning-text {
+    color: #e74c3c;
+    font-weight: bold;
+    margin-top: 8px;
+  }
+  

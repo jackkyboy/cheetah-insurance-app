@@ -1,0 +1,214 @@
+/*/Users/apichet/Downloads/cheetah-insurance-app/src/assets/styles/PackageList.css*/
+/* ====== Package List Styling ====== */
+.package-list {
+  padding: 20px;
+  font-family: "Roboto", sans-serif;
+  background-color: #f4f4f4;
+  color: #333;
+  min-height: 100vh;
+}
+
+/* ====== Company Logo ====== */
+
+.package-card img {
+  width: 100px;
+  height: auto;
+  object-fit: contain;
+  border: 1px solid #ddd; /* เพิ่มกรอบ */
+  border-radius: 4px; /* ทำมุมโค้ง */
+  background-color: #f9f9f9; /* สีพื้นหลัง */
+  padding: 5px;
+  transition: all 0.3s ease;
+}
+
+.package-card img:hover {
+  transform: scale(1.05); /* ขยายเมื่อ Hover */
+}
+
+
+.company-logo {
+  max-width: 100px;
+  max-height: 60px;
+  margin: 0 auto 10px;
+  display: block;
+  object-fit: contain;
+  border-radius: 8px;
+  background-color: #fff;
+  padding: 8px;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.company-logo:loading {
+  opacity: 0.5; /* โลโก้จะโปร่งบางลงเมื่อโหลด */
+}
+
+.company-logo:failed {
+  opacity: 0.3;
+  background-color: #eee; /* สีพื้นหลังเมื่อโหลดโลโก้ไม่ได้ */
+}
+
+
+
+/* ====== Header ====== */
+.package-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.package-header h2 {
+  font-size: 2rem;
+  color: #ff5722;
+  font-weight: bold;
+}
+
+.back-to-home-btn {
+  background-color: #1976d2;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.back-to-home-btn:hover {
+  background-color: #1565c0;
+  transform: scale(1.05);
+}
+
+/* ====== Grid ====== */
+.package-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 25px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* ====== Package Card ====== */
+.package-card {
+  background: linear-gradient(135deg, #ffffff, #f8f8f8);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid #ddd;
+}
+
+.package-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.package-title {
+  font-size: 1.4rem;
+  color: #ff5722;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+/* ====== Buttons ====== */
+.card-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.card-buttons .btn {
+  padding: 10px 15px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.card-buttons .btn-primary {
+  background-color: #4caf50;
+  color: #fff;
+}
+
+.card-buttons .btn-primary:hover {
+  background-color: #43a047;
+  transform: scale(1.05);
+}
+
+.card-buttons .btn-secondary {
+  background-color: #ff704d;
+  color: #fff;
+}
+
+.card-buttons .btn-secondary:hover {
+  background-color: #e64a19;
+  transform: scale(1.05);
+}
+
+/* ====== Modal Styling ====== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  max-width: 550px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content h3 {
+  color: #ff5722;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+}
+
+.btn-close {
+  background-color: #d32f2f;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.btn-close:hover {
+  background-color: #c62828;
+  transform: scale(1.05);
+}
+
+/* ====== Miscellaneous ====== */
+.error-message,
+.loading-message {
+  color: #ff5722;
+  text-align: center;
+  margin-top: 20px;
+  font-size: 1.2rem;
+}
+
+.no-packages-message {
+  color: #777;
+  text-align: center;
+  margin-top: 20px;
+  font-size: 1.1rem;
+}

@@ -1,0 +1,179 @@
+/* === ReviewInsurance.css === */
+
+.review-insurance-page {
+  max-width: 700px;
+  margin: 20px auto;
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+  background: #fffaf0;
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+h2 {
+  text-align: center;
+  color: #ff704d;
+  margin-bottom: 15px;
+  font-size: 1.8em;
+}
+
+.error-message,
+.success-message {
+  text-align: center;
+  font-weight: bold;
+  margin: 10px 0;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.error-message {
+  color: #d32f2f;
+  background-color: #ffebee;
+}
+
+.success-message {
+  color: #388e3c;
+  background-color: #e8f5e9;
+}
+
+/* ========== FORM SECTION ========== */
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 6px;
+  color: #444;
+}
+
+.company-dropdown {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1em;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.company-dropdown:focus {
+  border-color: #ff704d;
+  box-shadow: 0 0 5px rgba(255, 112, 77, 0.4);
+  outline: none;
+}
+
+/* ========== RATING ========== */
+
+.rating-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.rating-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.rating-wrapper input[type="range"].satisfaction {
+  width: 100%;
+  max-width: 350px;
+}
+
+/* ========== TEXTAREA ========== */
+
+.review-textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  resize: vertical;
+  font-size: 1em;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.review-textarea:focus {
+  border-color: #ff704d;
+  outline: none;
+  box-shadow: 0 0 5px rgba(255, 112, 77, 0.5);
+}
+
+.review-textarea::placeholder {
+  color: #999;
+  opacity: 0.7;
+  font-style: italic;
+}
+
+/* ========== BUTTONS ========== */
+
+.form-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.submit-btn,
+.cancel-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.3s ease, opacity 0.3s ease;
+}
+
+.submit-btn {
+  background: #ff704d;
+  color: white;
+}
+
+.cancel-btn {
+  background: #ddd;
+}
+
+.submit-btn:hover {
+  background: #e6653f;
+}
+
+.cancel-btn:hover {
+  background: #ccc;
+}
+
+.submit-btn[disabled],
+.cancel-btn[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ========== MOBILE ADAPTIVE ========== */
+
+@media (max-width: 768px) {
+  .form-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .rating-wrapper input[type="range"].satisfaction {
+    max-width: 100%;
+  }
+}
+

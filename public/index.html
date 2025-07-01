@@ -1,0 +1,30 @@
+<!--/Users/apichet/Downloads/cheetah-insurance-app/public/index.html-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cheetah Insurance App</title>
+
+    <!-- ✅ PRELOAD THEME BEFORE REACT MOUNTS -->
+    <!-- ✅ แนะนำให้เพิ่ม setAttribute("data-theme", theme); -->
+    <script>
+      (function () {
+        try {
+          const theme = localStorage.getItem("theme");
+          if (theme) {
+            document.documentElement.classList.add(theme);
+            document.body.classList.add(theme);
+            document.documentElement.setAttribute("data-theme", theme); // ✅ เพิ่มบรรทัดนี้
+          }
+        } catch (e) {
+          console.warn("⚠️ Failed to apply theme on load:", e);
+        }
+      })();
+    </script>
+
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

@@ -1,0 +1,110 @@
+.upload-documents-page {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+  }
+  
+  .page-title {
+    font-size: 1.6rem;
+    color: #e67e22;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .document-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .doc-card {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    background: #fafafa;
+    transition: background 0.2s ease;
+  }
+  
+  /* ✅ Background & border color by status */
+  .doc-card.uploaded {
+    background-color: #e8f7e4;
+    border-color: #b4e1b4;
+  }
+  
+  .doc-card.verified {
+    background-color: #e0f8ff;
+    border-color: #a4dcf0;
+  }
+  
+  .doc-card.rejected {
+    background-color: #fff3e6;
+    border-color: #f5c39b;
+  }
+  
+  .doc-card.missing {
+    background-color: #fff2f2;
+    border-color: #f2c0c0;
+  }
+  
+  .doc-card-icon {
+    font-size: 2rem;
+    margin-right: 1rem;
+    color: #ffa500;
+  }
+  
+  .doc-card-info {
+    flex: 1;
+  }
+  
+  .doc-card-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #2c3e50;
+  }
+  
+  .doc-card-subtitle {
+    font-size: 0.85rem;
+    color: #7f8c8d;
+  }
+  
+  .doc-card-status {
+    text-align: right;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  
+  /* ✅ Status label colors */
+  .status-uploaded {
+    color: #27ae60;
+  }
+  
+  .status-verified {
+    color: #3498db;
+    font-weight: bold;
+  }
+  
+  .status-rejected {
+    color: #e67e22;
+    font-weight: bold;
+  }
+  
+  .status-missing {
+    color: #c0392b;
+  }
+  
+  .toggle-button {
+    margin: 1.5rem auto 0;
+    display: block;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: none;
+    font-weight: bold;
+    color: #e67e22;
+    cursor: pointer;
+  }
+  
