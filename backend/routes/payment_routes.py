@@ -10,6 +10,8 @@ import jwt
 from datetime import datetime
 from backend.models import db
 from backend.models.Payments import Payments
+from backend.models.Customers import Customers
+
 
 
 
@@ -253,7 +255,9 @@ def handle_payment_webhook():
         return jsonify({"error": "An error occurred while processing webhook"}), 500
 
 
-
+# /Users/apichet/Downloads/cheetah-insurance-app/backend/routes/payment_routes.py
+# /Users/apichet/Downloads/cheetah-insurance-app/backend/routes/payment_routes.py
+# /backend/routes/payment_routes.py
 @payment_bp.route("/status/<string:invoice_no>", methods=["GET"])
 def get_payment_status_by_invoice(invoice_no):
     """
@@ -275,9 +279,7 @@ def get_payment_status_by_invoice(invoice_no):
     
 
 
-# /Users/apichet/Downloads/cheetah-insurance-app/backend/routes/payment_routes.py
-# /Users/apichet/Downloads/cheetah-insurance-app/backend/routes/payment_routes.py
-# /backend/routes/payment_routes.py
+
 @payment_bp.route("/orders", methods=["GET"])
 @jwt_required()
 def get_customer_orders():
@@ -305,20 +307,38 @@ def get_customer_orders():
         logger.error(f"Error fetching orders: {str(e)}", exc_info=True)
         return jsonify({"error": "An error occurred while fetching orders"}), 500
 
-@payment_bp.route("/orders/customer/<int:customer_id>", methods=["GET"])
-def get_orders_by_customer(customer_id):
-    try:
-        logger.debug(f"Fetching orders for customer_id={customer_id}")
-        orders = Payments.query.filter_by(customer_id=customer_id).all()
-        if not orders:
-            logger.info(f"⚠️ No orders found for customer_id={customer_id}")
-            return jsonify({"orders": [], "message": "ยังไม่มีคำสั่งซื้อ"}), 200
 
-        # Log details about the fetched orders
-        logger.debug(f"Orders fetched: {orders}")
-        order_list = [order.to_dict() for order in orders]
-        logger.debug(f"Order list to return: {order_list}")
-        return jsonify({"orders": order_list}), 200
+
+
+@payment_bp.route("/orders/customer/<int:customer_id>", methods=["GET"])
+@jwt_required()
+def get_orders_by_customer(customer_id):
+    """
+    Return all payment orders for a specific customer_id,
+    but only if the authenticated user owns that customer.
+    """
+    try:
+        user_id = get_jwt_identity()
+        logger.debug(f"🔒 Verifying ownership: user_id={user_id} vs customer_id={customer_id}")
+
+        customer = Customers.query.filter_by(customer_id=customer_id).first()
+
+        if not customer:
+            logger.warning(f"❌ Customer ID {customer_id} not found in DB.")
+            return jsonify({"error": "Customer not found"}), 404
+
+        if customer.user_id != user_id:
+            logger.warning(f"⛔ Access denied: user_id={user_id} does not own customer_id={customer_id}")
+            return jsonify({"error": "Access denied"}), 403
+
+        orders = Payments.query.filter_by(customer_id=customer_id).all()
+        logger.debug(f"✅ Found {len(orders)} order(s) for customer_id={customer_id}")
+
+        return jsonify({
+            "orders": [order.to_dict() for order in orders],
+            "message": "ยังไม่มีคำสั่งซื้อ" if not orders else "คำสั่งซื้อถูกดึงสำเร็จ"
+        }), 200
+
     except Exception as e:
-        logger.error(f"Error fetching orders for customer_id={customer_id}: {str(e)}", exc_info=True)
+        logger.exception(f"❌ Unexpected error while checking orders for customer_id={customer_id}")
         return jsonify({"error": "An error occurred while fetching orders"}), 500

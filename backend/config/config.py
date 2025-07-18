@@ -38,14 +38,24 @@ class Config:
     BACKEND_RETURN_URL = os.getenv("BACKEND_RETURN_URL", "http://127.0.0.1:5000/api/payment_callback")
 
     # --- CORS ---
-    CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "*").split(",")
+    CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", ",".join([
+        "http://localhost:3000",
+        "https://cheetahinsurancebroker.com",
+        "https://app.cheetahinsurancebroker.com",
+        "https://63894e1bb428.ngrok-free.app"
+    ])).split(",")
+
 
     # --- Database ---
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-    INSTANCE_DIR = os.path.join(BASE_DIR, "instance")
+    PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, ".."))
+    INSTANCE_DIR = os.path.join(PROJECT_ROOT, "instance")
+
     SQLALCHEMY_DATABASE_URI = os.getenv(
-        "DATABASE_URI", f"sqlite:///{os.path.join(INSTANCE_DIR, 'cheetah_insurance.db')}"
+        "DATABASE_URI",
+        f"sqlite:///{os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'instance', 'cheetah_insurance.db'))}"
     )
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # --- Uploads ---

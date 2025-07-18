@@ -1,0 +1,171 @@
+/* 🌟 แก้พื้นหลังให้เต็มหน้าจอ ไม่มีขอบขาวโผล่ */
+/* 🌟 แก้พื้นหลังให้เต็มหน้าจอ ไม่มีขอบขาวโผล่ */
+/* ✅ Layout เต็มหน้าจอ ไม่มีขอบขาว */
+.register-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100vw;
+  background: linear-gradient(135deg, #E67E22 10%, #F5CBA7 90%);
+  font-family: 'Poppins', sans-serif;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* ✅ กล่อง Form Container */
+.register-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90%;
+  max-width: 700px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  padding: 40px 30px;
+  box-sizing: border-box;
+}
+
+/* ✅ Form Layout */
+.register-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* ✅ หัวข้อฟอร์ม */
+.register-form h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #D35400;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.register-form h2::after {
+  content: "";
+  display: block;
+  width: 80px;
+  height: 4px;
+  background: #D35400;
+  margin: 10px auto 0;
+  border-radius: 2px;
+}
+
+/* ✅ ช่องกรอกข้อมูล */
+.register-input {
+  width: 100%;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: center;
+}
+
+.register-input input {
+  width: 100%;
+  max-width: 350px;
+  padding: 12px 15px;
+  background: #F2F2F2;
+  border: 1px solid rgba(230, 126, 34, 0.4);
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  transition: 0.3s ease-in-out;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+}
+
+.register-input input:focus {
+  border-color: #B34700;
+  box-shadow: 0 0 8px rgba(179, 71, 0, 0.4);
+}
+
+/* ✅ ปุ่มสมัครสมาชิก */
+.register-btn {
+  width: 100%;
+  max-width: 350px;
+  padding: 12px;
+  background: linear-gradient(135deg, #E67E22, #D35400);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 5px;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 10px rgba(211, 84, 0, 0.25);
+}
+
+.register-btn:hover {
+  background: linear-gradient(135deg, #D35400, #B34700);
+  box-shadow: 0 6px 12px rgba(211, 84, 0, 0.4);
+}
+
+.register-btn:active {
+  transform: scale(0.97);
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* ✅ ปุ่มกลับไปหน้า Login */
+.back-login-btn {
+  width: 100%;
+  max-width: 350px;
+  padding: 10px;
+  background: #fff;
+  color: #D35400;
+  border: 1px solid #D35400;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 3px 5px rgba(211, 84, 0, 0.2);
+}
+
+.back-login-btn:hover {
+  background: #D35400;
+  color: #fff;
+  box-shadow: 0 5px 10px rgba(211, 84, 0, 0.4);
+}
+
+/* ✅ Error / Success Messages */
+.error-message,
+.success-message {
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 10px 15px;
+  margin-bottom: 12px;
+  width: 100%;
+  max-width: 350px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.error-message {
+  background-color: #fbeeea;
+  color: #c0392b;
+  border: 1px solid #e74c3c;
+}
+
+.success-message {
+  background-color: #eafaf1;
+  color: #27ae60;
+  border: 1px solid #2ecc71;
+}
+
+/* ✅ Responsive Layout */
+@media (max-width: 480px) {
+  .register-container {
+    padding: 30px 20px;
+  }
+
+  .register-form h2 {
+    font-size: 1.5rem;
+  }
+}

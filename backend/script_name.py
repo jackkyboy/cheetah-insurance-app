@@ -2,12 +2,13 @@ from google.cloud import bigquery
 import time
 import os
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/apichet/Downloads/cheetah-insurance-app/backend/config/credentials.json"
-
-client = bigquery.Client()
+# แนะนำให้ตั้ง environment variable ภายนอก ไม่ตั้งในโค้ดโดยตรง
+# os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/path/to/credentials.json"
 
 def run_query():
     try:
+        client = bigquery.Client()  # ใช้ค่า GOOGLE_APPLICATION_CREDENTIALS จาก environment
+
         start_time = time.time()
 
         QUERY = """
@@ -39,7 +40,7 @@ def run_query():
 
         job_config = bigquery.QueryJobConfig(
             query_parameters=parameters,
-            use_query_cache=True  # Enable caching
+            use_query_cache=True  # เปิดใช้งาน query cache
         )
 
         query_job = client.query(QUERY, job_config=job_config)
@@ -48,8 +49,13 @@ def run_query():
         end_time = time.time()
         print(f"Query Results: {len(results)} rows retrieved")
         print(f"Time Taken: {end_time - start_time:.2f} seconds")
+
+        # แสดงข้อมูลบางส่วน (optional)
+        for row in results:
+            print(dict(row))
+
     except Exception as e:
         print(f"Error: {e}")
 
-run_query()
-
+if __name__ == "__main__":
+    run_query()

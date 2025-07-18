@@ -38,6 +38,8 @@ dist/
 backend/uploads/
 backend/static/uploads/
 backend/config/credentials.json
+cheetah-insurance-broker-7fd6654a42ca.json
+
 
 # Frontend build
 cheetah-insurance-app/build/

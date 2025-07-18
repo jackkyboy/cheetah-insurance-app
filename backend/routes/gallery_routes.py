@@ -9,7 +9,7 @@ from google.cloud import bigquery
 
 gallery_api_bp = Blueprint("gallery_api", __name__)
 
-# ✅ ย้ายออกมานอกฟังก์ชันให้ใช้ร่วมกันได้
+# ✅ Mapping: short code → full name + logo
 company_mapping = {
     "ergo": {
         "full_name": "บริษัท เออร์โกประกันภัย (ประเทศไทย) จำกัด (มหาชน)",
@@ -33,17 +33,12 @@ company_mapping = {
     }
 }
 
-# ✅ ฟังก์ชันเดียวพอ
 def get_company_info(code: str):
     normalized = (code or "").strip().lower()
     return company_mapping.get(normalized, {
         "full_name": code,
         "logo": "/gallery_logos/partners/default-logo.svg"
     })
-
-# (ฟังก์ชันอื่นๆ เช่น get_packages() อยู่ด้านล่างได้เลย)
-
-
 
 def reverse_company_lookup(full_name: str):
     full_name = (full_name or "").strip()
@@ -52,24 +47,28 @@ def reverse_company_lookup(full_name: str):
             return code
     return None
 
-
 @gallery_api_bp.route("/packages", methods=["GET"])
 def get_packages():
     try:
-        client = current_app.extensions["bigquery_config"].client
+        bq_service = current_app.extensions.get("bigquery_service")
+        if not bq_service:
+            current_app.logger.error("❌ BigQueryService not registered")
+            return jsonify({"error": "BigQueryService not available"}), 500
+
+        client = bq_service.client
 
         car_brand = request.args.get("brand")
         car_model = request.args.get("model")
         insurance_type = request.args.get("type")
         car_year_raw = request.args.get("year")
 
-        company_code = request.args.get("company", "").strip().lower()
-        company_info = get_company_info(company_code)
+        # ✅ Normalize input
+        raw_company_input = request.args.get("company", "").strip()
+        company_code = reverse_company_lookup(raw_company_input) or raw_company_input.strip().lower()
 
         limit = int(request.args.get("limit", 30))
         offset = int(request.args.get("offset", 0))
 
-        # === WHERE clause builder ===
         where_clauses = ["premium IS NOT NULL", "premium > 1000"]
         if car_brand:
             where_clauses.append("TRIM(LOWER(car_brand)) = @car_brand")
@@ -82,7 +81,7 @@ def get_packages():
         elif car_year_raw:
             current_app.logger.warning(f"⚠️ Invalid car_year received: {car_year_raw}")
         if company_code:
-            where_clauses.append("TRIM(LOWER(REPLACE(CAST(Insurance_company AS STRING), ' ', ''))) = @company")
+            where_clauses.append("TRIM(LOWER(Insurance_company)) = @company")
 
         where_sql = " AND ".join(where_clauses)
 
@@ -114,7 +113,6 @@ def get_packages():
             LIMIT @limit OFFSET @offset
         """
 
-        # === Build query params
         params = [
             bigquery.ScalarQueryParameter("limit", "INT64", limit),
             bigquery.ScalarQueryParameter("offset", "INT64", offset),
@@ -134,8 +132,10 @@ def get_packages():
         rows = [dict(row) for row in client.query(query, job_config=job_config).result()]
 
         for row in rows:
-            row["insurance_company"] = row.pop("Insurance_company", "")
-            info = get_company_info(row["insurance_company"])
+            raw_company_name = row.pop("Insurance_company", "")
+            row["insurance_company"] = raw_company_name
+            normalized_code = (raw_company_name or "").strip().lower()
+            info = get_company_info(normalized_code)
             row["company_full_name"] = info["full_name"]
             row["company_logo"] = info["logo"]
 
@@ -144,6 +144,8 @@ def get_packages():
     except Exception as e:
         current_app.logger.error(f"❌ Error in get_packages: {e}")
         return jsonify({"error": str(e)}), 500
+
+
 
 
 

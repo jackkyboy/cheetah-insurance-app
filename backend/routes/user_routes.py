@@ -427,3 +427,26 @@ def extract_token():
         raise ValueError("Invalid token payload")
     
     return user_id
+
+
+
+
+@user_bp.route("/me", methods=["GET"])
+def get_user_me():
+    try:
+        user_id = extract_token()
+        user = Users.query.filter_by(user_id=user_id).first()
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        customer = user.customer  # ✅ แก้ตรงนี้ ไม่ใช้ query
+
+        return jsonify({
+            "user_id": user.user_id,
+            "email": user.email,
+            "customer_id": customer.customer_id if customer else None,
+            "name": f"{customer.first_name} {customer.last_name}" if customer else None
+        }), 200
+    except Exception as e:
+        logging.exception("❌ Failed to fetch /me user info")
+        return jsonify({"error": "Unable to fetch user info"}), 500

@@ -1,0 +1,54 @@
+<!--/Users/apichet/Downloads/cheetah-insurance-app/frontend/public/index.html-->
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Cheetah Insurance App</title>
+    <meta name="description" content="เปรียบเทียบประกันภัยรถยนต์ออนไลน์ได้ทันที - Cheetah Insurance" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="robots" content="index, follow" />
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+
+    <!-- ✅ preload theme before React mounts -->
+    <script>
+      (function () {
+        try {
+          const theme = localStorage.getItem("theme");
+          if (theme) {
+            document.documentElement.classList.add(theme);
+            document.body.classList.add(theme);
+            document.documentElement.setAttribute("data-theme", theme);
+          }
+        } catch (e) {
+          console.warn("⚠️ Failed to apply theme on load:", e);
+        }
+      })();
+    </script>
+
+    <!-- ✅ fallback for no JavaScript -->
+    <style>
+      noscript {
+        display: block;
+        text-align: center;
+        padding: 50px;
+        font-size: 1.2rem;
+        color: red;
+        background: #fffbe6;
+      }
+    </style>
+  </head>
+
+  <body>
+    <noscript>
+      🚫 คุณต้องเปิดใช้งาน JavaScript เพื่อใช้งานเว็บไซต์นี้
+    </noscript>
+    <div id="root"></div>
+  </body>
+</html>

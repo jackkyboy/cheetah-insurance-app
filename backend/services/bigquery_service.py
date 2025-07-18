@@ -5,25 +5,34 @@ import logging
 import os
 
 class BigQueryService:
-    def __init__(self, project_id, location):
+    def __init__(self, project_id=None, location=None):
         """
-        Initialize the BigQueryService with the specified project ID and location.
+        Initialize the BigQueryService with project ID and location from env if not passed explicitly.
         """
-        credentials_path = "/Users/apichet/Downloads/cheetah-insurance-app/backend/config/credentials.json"
-        if not os.path.exists(credentials_path):
-            logging.error(f"Credentials file not found: {credentials_path}")
+        credentials_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+        if not credentials_path or not os.path.exists(credentials_path):
+            logging.error(f"❌ Credentials file not found: {credentials_path}")
             raise FileNotFoundError(f"Credentials file not found: {credentials_path}")
         
-        if os.getenv("GOOGLE_APPLICATION_CREDENTIALS") != credentials_path:
-            os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = credentials_path
-            logging.debug(f"GOOGLE_APPLICATION_CREDENTIALS set to {credentials_path}")
+        # ใช้ค่า .env หากไม่ได้ส่งมา
+        if not project_id:
+            project_id = os.getenv("BIGQUERY_PROJECT_ID")
+        if not location:
+            location = os.getenv("BIGQUERY_LOCATION")
+
+        if not project_id or not location:
+            raise ValueError("❌ BIGQUERY_PROJECT_ID and BIGQUERY_LOCATION must be set in .env or passed in.")
+
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = credentials_path
+        logging.debug(f"✅ GOOGLE_APPLICATION_CREDENTIALS set to {credentials_path}")
 
         try:
             self.client = bigquery.Client(project=project_id, location=location)
-            logging.debug("BigQuery Client initialized successfully.")
+            logging.debug("✅ BigQuery Client initialized.")
         except Exception as e:
-            logging.error(f"Failed to initialize BigQuery Client: {str(e)}")
+            logging.error(f"❌ Failed to initialize BigQuery Client: {str(e)}")
             raise RuntimeError(f"Error initializing BigQuery Client: {str(e)}")
+
 
     def execute_query_with_count(self, query, parameters):
         """

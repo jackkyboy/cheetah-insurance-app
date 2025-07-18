@@ -1,71 +1,55 @@
 # /Users/apichet/Downloads/cheetah-insurance-app/backend/config/bigquery_config.py
-from google.cloud import bigquery
+# /backend/config/bigquery_config.py
+
 import os
 import logging
+from google.cloud import bigquery
 
-# ตั้งค่าการบันทึก (Logging)
-logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
 
 class BigQueryConfig:
     def __init__(self):
-        """
-        Initialize the BigQueryConfig and set up the BigQuery client with asia-southeast1 location.
-        """
-        self.client = self._initialize_client()
+        self.client = None
 
-    @staticmethod
-    def _initialize_client():
+    def initialize_client(self):
         """
-        Initialize the BigQuery client by checking the credentials and setting up the environment.
-        Forces location to 'asia-southeast1'
+        Initialize BigQuery client with credentials from GOOGLE_APPLICATION_CREDENTIALS.
+        Forces location to 'asia-southeast1'.
         """
         try:
-            # ✅ Force path to local credentials file (explicit path)
-            credentials_path = "/Users/apichet/Downloads/cheetah-insurance-app/backend/config/credentials.json"
+            credentials_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+            logger.debug(f"[DEBUG] GOOGLE_APPLICATION_CREDENTIALS={credentials_path}")
 
-            if not os.path.exists(credentials_path):
-                raise FileNotFoundError(f"❌ Credentials file not found at {credentials_path}")
+            if not credentials_path or not os.path.isfile(credentials_path):
+                raise FileNotFoundError(
+                    f"❌ GOOGLE_APPLICATION_CREDENTIALS is not set or file does not exist: {credentials_path}"
+                )
 
-            # ✅ Set environment variable if not already set
-            if os.getenv("GOOGLE_APPLICATION_CREDENTIALS") != credentials_path:
-                os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = credentials_path
-                logger.debug(f"✅ GOOGLE_APPLICATION_CREDENTIALS set to {credentials_path}")
-
-            # ✅ Initialize client with correct region
-            client = bigquery.Client(location="asia-southeast1")
-            logger.info("✅ BigQuery client created successfully in asia-southeast1.")
-            return client
+            logger.debug(f"✅ Using credentials: {credentials_path}")
+            self.client = bigquery.Client(location="asia-southeast1")
+            logger.info("✅ BigQuery client initialized (asia-southeast1)")
 
         except Exception as e:
-            logger.error(f"❌ Error initializing BigQuery client: {e}")
-            raise RuntimeError("Failed to initialize BigQuery client. Check your configuration.")
+            logger.error(f"❌ Error initializing BigQuery client: {e}", exc_info=True)
+            raise RuntimeError("Failed to initialize BigQuery client.")
 
     def run_query(self, query, parameters=None):
-        """
-        Run a BigQuery SQL query with optional parameters.
-
-        :param query: (str) SQL query
-        :param parameters: (list of bigquery.ScalarQueryParameter)
-        :return: Query result as RowIterator
-        """
         if not self.client:
-            raise RuntimeError("BigQuery client is not initialized.")
+            raise RuntimeError("BigQuery client is not initialized. Call `initialize_client()` first.")
 
         try:
-            logger.debug(f"🚀 Running BigQuery query:\n{query}")
+            logger.debug(f"🚀 Executing query:\n{query}")
             if parameters:
                 logger.debug(f"📦 Parameters: {parameters}")
 
             job_config = bigquery.QueryJobConfig(query_parameters=parameters or [])
-            query_job = self.client.query(query, job_config=job_config)
-            result = query_job.result()
-            logger.info(f"✅ Query executed successfully. Rows: {result.total_rows}")
+            result = self.client.query(query, job_config=job_config).result()
+
+            logger.info(f"✅ Query executed: {result.total_rows} rows returned")
             return result
 
         except Exception as e:
-            logger.error(f"❌ Error executing BigQuery query: {e}", exc_info=True)
-            raise RuntimeError(f"BigQuery query execution failed: {e}")
-
-# 🔧 Global instance (use only if absolutely needed)
-bigquery_config = BigQueryConfig()
+            logger.error(f"❌ Query failed: {e}", exc_info=True)
+            raise RuntimeError(f"BigQuery query failed: {e}")

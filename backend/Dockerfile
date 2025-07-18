@@ -7,7 +7,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     FLASK_ENV=production \
     PYTHONPATH=/app \
-    GOOGLE_APPLICATION_CREDENTIALS=/app/backend/config/credentials.json
+    GOOGLE_APPLICATION_CREDENTIALS=/app/config/credentials.json
+
+
 
 # ✅ ทำงานใน /app
 WORKDIR /app

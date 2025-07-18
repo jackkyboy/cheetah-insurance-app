@@ -26,6 +26,7 @@ CORS(app, resources={r"/*": {"origins": "*"}})  # Enable CORS for all routes
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+
 class PaymentService:
     @staticmethod
     def validate_payment_environment():
@@ -44,7 +45,6 @@ class PaymentService:
                 raise ValueError(f"❌ Missing required environment variable: {env}")
         logger.info("✅ All required environment variables are set.")
 
-class PaymentService:
     @staticmethod
     def create_payment_order(customer_id, package_data):
         """
@@ -60,39 +60,31 @@ class PaymentService:
         try:
             logger.debug(f"🚀 Starting to create payment order. Customer ID: {customer_id}, Package Data: {package_data}")
 
-            # Validate customer_id
             if not customer_id:
                 logger.warning("⚠️ Customer ID is missing.")
                 raise ValueError("❌ Customer ID is required.")
 
-            # Generate order_id
             order_id = str(uuid.uuid4())
             logger.debug(f"🔧 Generated order ID: {order_id} for customer_id={customer_id}")
 
-            # Extract and validate amount
             amount = package_data.get("amount", 0)
             if amount <= 0:
                 logger.warning(f"⚠️ Invalid amount: {amount} for order_id={order_id}")
                 raise ValueError("❌ Amount must be greater than 0.")
 
-            # Validate package_id (can be null but must be an integer if provided)
             package_id = package_data.get("package_id")
             if package_id is not None and not isinstance(package_id, int):
                 logger.warning(f"⚠️ Invalid package ID: {package_id} for order_id={order_id}")
                 raise ValueError("❌ Package ID must be an integer or null.")
 
-            # Handle add_ons as a comma-separated string
             add_ons = package_data.get("add_ons", [])
             if not isinstance(add_ons, list):
                 logger.warning(f"⚠️ Invalid add-ons format: {add_ons} for order_id={order_id}")
                 raise ValueError("❌ Add-ons must be a list.")
-            add_ons_str = ",".join(map(str, add_ons))  # Convert list to comma-separated string
-            logger.debug(f"🛠️ Add-ons processed for order_id={order_id}: {add_ons_str}")
+            add_ons_str = ",".join(map(str, add_ons))
 
-            # Log details of the payment being created
             logger.debug(f"📋 Payment Details - Amount: {amount}, Package ID: {package_id}, Add-ons: {add_ons_str}")
 
-            # Create payment order
             payment = Payments(
                 order_id=order_id,
                 customer_id=customer_id,
@@ -115,7 +107,6 @@ class PaymentService:
                 payment_status="pending",
             )
 
-            # Save to database
             db.session.add(payment)
             db.session.commit()
 
@@ -129,6 +120,7 @@ class PaymentService:
             db.session.rollback()
             logger.exception(f"❌ Error creating payment order for customer_id={customer_id}: {str(e)}")
             raise Exception(f"Error creating payment order: {str(e)}")
+
 
 
     @staticmethod
@@ -222,6 +214,31 @@ class PaymentService:
         except Exception as e:
             logger.error(f"❌ Unexpected error: {e}")
             raise Exception("An unexpected error occurred during payment processing.") from e
+        
+
+    @staticmethod
+    def get_payment_order(order_id):
+        """
+        Fetch a payment order using the order_id (UUID).
+
+        Args:
+            order_id (str): The unique order ID.
+
+        Returns:
+            dict: A dictionary representation of the payment order or None if not found.
+        """
+        try:
+            logger.debug(f"🔍 Searching for payment with order_id={order_id}")
+            payment = Payments.query.filter_by(order_id=order_id).first()
+            if not payment:
+                logger.warning(f"⚠️ No payment found for order_id={order_id}")
+                return None
+            logger.info(f"✅ Payment order found: {order_id}")
+            return payment.to_dict()
+        except Exception as e:
+            logger.error(f"❌ Error fetching payment order: {e}", exc_info=True)
+            return None
+
 
     @staticmethod
     def generate_2c2p_payment_url(payment):

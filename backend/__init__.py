@@ -1,7 +1,7 @@
 # /Users/apichet/Downloads/cheetah-insurance-app/backend/__init__.py
 import os
 import logging
-from flask import Flask
+from flask import Flask, request
 from flask_migrate import Migrate
 from flask_cors import CORS
 
@@ -16,68 +16,99 @@ from backend.extensions import cache
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-# === Init Flask App ===
-app = Flask(__name__, instance_relative_config=True)
-app.config.from_object(Config)
+def create_app():
+    app = Flask(__name__, instance_relative_config=True)
+    app.config.from_object(Config)
 
-# === Enable CORS ===
-CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
+    configure_database(app)
+    configure_cache(app)
+    configure_cors(app)
+    configure_bigquery(app)
+    register_routes(app)
 
-# === SQLite DB Config (local dev only) ===
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-DB_PATH = os.path.join(BASE_DIR, "instance", "cheetah_insurance.db")
-app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{DB_PATH}"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SQLALCHEMY_ECHO"] = False
+    register_after_request_handler(app)
 
-# === Init DB + Migrate ===
-db.init_app(app)
-Migrate(app, db)
+    return app
 
-# === Init Cache ===
-cache.init_app(app)
-if "cache" not in app.extensions:
-    app.extensions["cache"] = {}
-app.extensions["cache"]["default"] = cache
-app.extensions["cache"][cache] = cache
-logger.debug("✅ Cache bound to app.extensions['cache']")
+def configure_database(app):
+    BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+    DB_PATH = os.path.join(BASE_DIR, "instance", "cheetah_insurance.db")
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{DB_PATH}"
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config["SQLALCHEMY_ECHO"] = False
 
-# === Inject BigQueryService ===
-try:
-    project_id = os.getenv("GOOGLE_CLOUD_PROJECT", "cheetah-insurance-broker")
-    bq_service = BigQueryService(project_id=project_id, location="asia-southeast1")
-    app.extensions["bigquery_service"] = bq_service
-    logger.info(f"✅ BigQueryService injected: {project_id}")
-except Exception as e:
-    logger.critical(f"❌ BigQueryService init failed: {e}")
-    raise
+    db.init_app(app)
+    Migrate(app, db)
 
-# === Register Blueprints ===
-try:
-    set_app_instance(app)
-    register_blueprints(app)
-    logger.info("✅ Blueprints registered.")
-except Exception as e:
-    logger.error(f"❌ Blueprint registration failed: {e}")
-    raise
+    with app.app_context():
+        try:
+            db.create_all()
+            logger.debug("✅ DB tables created.")
+        except Exception as e:
+            logger.error(f"❌ DB creation failed: {e}")
+            raise
 
-# === Initialize DB Tables + Models ===
-with app.app_context():
+        try:
+            initialize_models()
+            logger.debug("✅ Models initialized.")
+        except Exception as e:
+            logger.error(f"❌ Model init failed: {e}")
+            raise
+
+def configure_cache(app):
+    cache.init_app(app)
+    app.extensions.setdefault("cache", {})["default"] = cache
+    logger.debug("✅ Cache bound to app.extensions['cache']")
+
+def configure_bigquery(app):
     try:
-        db.create_all()
-        logger.debug("✅ DB tables created.")
+        project_id = os.getenv("GOOGLE_CLOUD_PROJECT", "cheetah-insurance-broker")
+        bq_service = BigQueryService(project_id=project_id, location="asia-southeast1")
+        app.extensions["bigquery_service"] = bq_service
+        logger.info(f"✅ BigQueryService injected: {project_id}")
     except Exception as e:
-        logger.error(f"❌ DB creation failed: {e}")
+        logger.critical(f"❌ BigQueryService init failed: {e}")
         raise
 
+def configure_cors(app):
+    CORS(app, resources={
+        r"/api/*": {
+            "origins": [
+                "http://localhost:3000",
+                "https://cheetahinsurancebroker.com",
+                "https://app.cheetahinsurancebroker.com",
+                "https://63894e1bb428.ngrok-free.app"
+            ],
+            "supports_credentials": True
+        }
+    }, supports_credentials=True)
+
+def register_routes(app):
     try:
-        initialize_models()
-        logger.debug("✅ Models initialized.")
+        set_app_instance(app)
+        register_blueprints(app)
+        logger.info("✅ Blueprints registered.")
     except Exception as e:
-        logger.error(f"❌ Model init failed: {e}")
+        logger.error(f"❌ Blueprint registration failed: {e}")
         raise
 
-# === Health Check ===
-@app.route("/api/health", methods=["GET"])
-def health_check():
-    return {"status": "ok"}, 200
+    @app.route("/api/health", methods=["GET"])
+    def health_check():
+        return {"status": "ok"}, 200
+    
+
+
+def register_after_request_handler(app):
+    @app.after_request
+    def after_request_cors(response):
+        origin = request.headers.get("Origin")
+        allowed_origins = app.config.get("CORS_ALLOWED_ORIGINS", [])
+
+        if origin in allowed_origins:
+            response.headers["Access-Control-Allow-Origin"] = origin  # ✅ Only one origin
+            response.headers["Vary"] = "Origin"  # ✅ Recommend for caching
+
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+        return response

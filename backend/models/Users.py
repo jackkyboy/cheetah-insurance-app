@@ -1,4 +1,5 @@
 # /Users/apichet/Downloads/cheetah-insurance-app/backend/models/Users.py
+# ✅ ปรับแล้ว
 import logging
 from backend.models import db
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -16,7 +17,10 @@ class Users(db.Model):
 
     # Columns
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment="Primary key for Users table")
-    customer_id = db.Column(db.Integer, db.ForeignKey('Customers.customer_id'), nullable=False, comment="Foreign key referencing Customers")
+    
+    # ❌ ลบออก: customer_id (เพราะความสัมพันธ์ควรอยู่ใน Customers)
+    # customer_id = db.Column(db.Integer, db.ForeignKey('Customers.customer_id'), nullable=False)
+
     email = db.Column(db.String(255), unique=True, nullable=False, comment="User's email address (must be unique)")
     password_hash = db.Column(db.String(255), nullable=False, comment="Hashed password for secure authentication")
     profile_picture = db.Column(db.String(255), nullable=True, comment="Path to user's profile picture (if any)")
@@ -24,12 +28,11 @@ class Users(db.Model):
     theme_color = db.Column(db.String(7), nullable=True, comment="Hexadecimal code for user's profile theme color")
     created_at = db.Column(db.DateTime, default=datetime.utcnow, comment="Timestamp for when the user was created")
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, comment="Timestamp for last profile update")
-
-    # ✅ เพิ่ม role ลงใน Model Users (ถูกต้อง)
     role = db.Column(db.String(50), nullable=True, comment="User role (e.g. admin, user)")
 
-    # Relationships
-    customer = db.relationship('Customers', back_populates='user', lazy='joined')
+    # ✅ ความสัมพันธ์กับ Customers → user.customer ใช้งานได้เหมือนเดิม
+    customer = db.relationship('Customers', back_populates='user', uselist=False, lazy='joined')
+
     insurance_preparations = db.relationship('InsurancePreparation', back_populates='user', cascade='all, delete-orphan', lazy='select')
 
 
@@ -79,9 +82,10 @@ class Users(db.Model):
         Converts the User object into a dictionary for JSON serialization.
         """
         logger.debug(f"Converting user_id={self.user_id} to dictionary")
+
         return {
             "user_id": self.user_id,
-            "customer_id": self.customer_id,
+            "customer_id": self.customer.customer_id if self.customer else None,
             "email": self.email,
             "profile_picture": self.profile_picture,
             "bio": self.bio,
@@ -89,6 +93,7 @@ class Users(db.Model):
             "created_at": self.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.created_at else None,
             "updated_at": self.updated_at.strftime('%Y-%m-%d %H:%M:%S') if self.updated_at else None,
         }
+
 
     @staticmethod
     def get_user_by_id(user_id):

@@ -13,7 +13,7 @@ from datetime import datetime, timedelta  # ✅ ใช้ datetime ได้ถ�
 import jwt
 import logging
 import datetime
-from flask_babel import Message  
+from flask_mail import Message
 
 # ✅ ตั้งค่า Logging
 logging.basicConfig(level=logging.DEBUG)
@@ -80,37 +80,36 @@ def register():
             logger.warning("⚠️ Missing required fields.")
             return jsonify({"error": "All fields are required"}), 400
 
-        # 🔍 Check if user exists
+        # 🔍 Check if customer exists
         existing_customer = Customers.find_by_email(email)
         if existing_customer:
             logger.warning(f"⚠️ Email already exists: {email}")
             return jsonify({"error": "Email already registered"}), 400
 
-        # 👤 Create new customer
+        # 🔐 Create new user first
+        new_user = Users(email=email)
+        new_user.set_password(password)
+        db.session.add(new_user)
+        db.session.flush()  # 🧬 ดึง user_id มาใช้
+
+        # 👤 Create customer with user_id
         new_customer = Customers(
             email=email,
             first_name=first_name,
-            last_name=last_name
+            last_name=last_name,
+            user_id=new_user.user_id  # ✅ ใส่ FK ไปยัง Users
         )
         db.session.add(new_customer)
-        db.session.flush()  # ✅ เพื่อให้ customer_id ใช้ได้ทันที
-
-        # 🔐 Create new user
-        new_user = Users(
-            email=email,
-            customer_id=new_customer.customer_id
-        )
-        new_user.set_password(password)
-        db.session.add(new_user)
 
         db.session.commit()
-        logger.info(f"✅ User registered: {email} (customer_id={new_customer.customer_id})")
+        logger.info(f"✅ User registered: {email} (user_id={new_user.user_id})")
         return jsonify({"message": "User registered successfully"}), 201
 
     except Exception as e:
         db.session.rollback()
         logger.error(f"❌ Registration failed: {str(e)}", exc_info=True)
         return jsonify({"error": f"Registration failed: {str(e)}"}), 500
+
 
     
 
@@ -266,6 +265,7 @@ def logout():
 
 
 # ✅ Route: Forgot Password
+# ✅ Route: Forgot Password
 @auth_bp.route("/forgot-password", methods=["POST"])
 def forgot_password():
     try:
@@ -275,25 +275,41 @@ def forgot_password():
         if not email:
             return jsonify({"error": "Email is required"}), 400
 
+        # ค้นหาผู้ใช้ในตาราง Users หรือ Admins
         user = Users.query.filter_by(email=email).first() or Admins.query.filter_by(email=email).first()
         if not user:
             return jsonify({"error": "User not found"}), 404
 
-        reset_token = jwt.encode({"user_id": user.user_id if hasattr(user, 'user_id') else user.admin_id, "email": email, "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)}, current_app.config["JWT_SECRET_KEY"], algorithm="HS256")
+        # สร้าง JWT token สำหรับรีเซ็ตรหัสผ่าน (หมดอายุใน 1 ชั่วโมง)
+        reset_token = jwt.encode(
+            {
+                "user_id": getattr(user, "user_id", None) or getattr(user, "admin_id", None),
+                "email": email,
+                "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+            },
+            current_app.config["JWT_SECRET_KEY"],
+            algorithm="HS256"
+        )
 
-        reset_link = f"{current_app.config.get('FRONTEND_RETURN_URL', 'http://localhost:3000')}/reset-password?token={reset_token}"
+        # สร้างลิงก์สำหรับรีเซ็ตรหัสผ่าน
+        frontend_url = current_app.config.get('FRONTEND_RETURN_URL', 'http://localhost:3000')
+        reset_link = f"{frontend_url}/reset-password?token={reset_token}"
 
-        msg = Message(subject="Reset Your Password", sender=current_app.config["MAIL_DEFAULT_SENDER"], recipients=[email], body=f"Click the link below to reset your password:\n\n{reset_link}\n\nThis link will expire in 1 hour.")
+        # สร้างและส่งอีเมลล์รีเซ็ตรหัสผ่าน
+        msg = Message(
+            subject="Reset Your Password",
+            sender=current_app.config["MAIL_DEFAULT_SENDER"],
+            recipients=[email],
+            body=f"Click the link below to reset your password:\n\n{reset_link}\n\nThis link will expire in 1 hour."
+        )
         mail = current_app.extensions.get("mail")
         mail.send(msg)
 
         return jsonify({"message": "Password reset email sent successfully"}), 200
 
     except Exception as e:
+        logger.error(f"❌ Forgot password failed: {e}", exc_info=True)
         return jsonify({"error": "Failed to process password reset request"}), 500
-    
-
-
 
 
 

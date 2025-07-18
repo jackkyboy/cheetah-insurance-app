@@ -16,6 +16,7 @@ class Customers(db.Model):
     __tablename__ = 'Customers'
 
     # Columns
+    # Columns
     customer_id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment="Primary key for the Customers table")
     first_name = db.Column(db.String(50), nullable=False, comment="Customer's first name")
     last_name = db.Column(db.String(50), nullable=False, comment="Customer's last name")
@@ -24,6 +25,10 @@ class Customers(db.Model):
     address = db.Column(db.Text, nullable=True, comment="Customer's physical address")
     created_at = db.Column(db.DateTime, default=datetime.utcnow, comment="Timestamp when the customer was created")
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, comment="Timestamp when the customer was last updated")
+
+    # ✅ เพิ่ม ForeignKey → Users
+    user_id = db.Column(db.Integer, db.ForeignKey('Users.user_id'), nullable=False, unique=True, comment="Foreign key to Users table (1:1 relationship)")
+
 
     # Relationships
     user = db.relationship(

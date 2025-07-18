@@ -44,3 +44,6 @@ flask-caching
 pytesseract
 oauth2client==4.1.3
 gspread==6.0.2
+flask_babel
+Flask-Mail
+openai
