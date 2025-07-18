@@ -16,6 +16,8 @@ services:
       - ./backend/static:/app/static
     depends_on:
       - frontend
+    networks:
+      - cheetah-network
 
   frontend:
     build:
@@ -27,6 +29,8 @@ services:
       - "3000:80"
     environment:
       - NODE_ENV=production
+    networks:
+      - cheetah-network
 
   nginx:
     image: nginx:alpine
@@ -42,3 +46,9 @@ services:
     depends_on:
       - frontend
       - backend
+    networks:
+      - cheetah-network
+
+networks:
+  cheetah-network:
+    driver: bridge
