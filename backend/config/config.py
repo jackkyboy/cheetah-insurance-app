@@ -1,9 +1,10 @@
 # /Users/apichet/Downloads/cheetah-insurance-app/backend/config/config.py
 # /backend/config/config.py
 import os
+import base64
 from dotenv import load_dotenv
 
-# 🧠 เลือกโหลด .env ตาม ENVIRONMENT
+# === 🧠 เลือกโหลด .env ตาม ENVIRONMENT ===
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "development").lower()
 dotenv_file = {
     "production": ".env.production",
@@ -13,6 +14,34 @@ dotenv_file = {
 
 if os.path.exists(dotenv_file):
     load_dotenv(dotenv_file)
+
+# === 🔐 Decode base64 secret files ===
+def decode_base64_cert_files():
+    secret_map = {
+        "SANDBOX_PKCS7_BASE64": "/tmp/sandbox-pkcs7.cer",
+        "PRIVATE_KEY_BASE64": "/tmp/merchant-private-key.der",
+        "PUBLIC_CERT_BASE64": "/tmp/jwt-demo.cer",
+        "GOOGLE_CREDENTIALS_BASE64": "/tmp/credentials.json",
+    }
+
+    for env_var, out_path in secret_map.items():
+        val = os.getenv(env_var)
+        if val:
+            try:
+                with open(out_path, "wb") as f:
+                    f.write(base64.b64decode(val))
+                print(f"✅ Decoded {env_var} → {out_path}")
+            except Exception as e:
+                print(f"❌ Failed to decode {env_var}: {e}")
+        else:
+            print(f"⚠️ Missing environment variable: {env_var}")
+
+    # Set GCP credentials path
+    if os.getenv("GOOGLE_CREDENTIALS_BASE64"):
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/tmp/credentials.json"
+
+# 🧪 เรียก decode ก่อนโหลด config
+decode_base64_cert_files()
 
 class Config:
     # --- Environment & Secrets ---
@@ -45,17 +74,14 @@ class Config:
         "https://63894e1bb428.ngrok-free.app"
     ])).split(",")
 
-
     # --- Database ---
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
     PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, ".."))
     INSTANCE_DIR = os.path.join(PROJECT_ROOT, "instance")
-
     SQLALCHEMY_DATABASE_URI = os.getenv(
         "DATABASE_URI",
-        f"sqlite:///{os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'instance', 'cheetah_insurance.db'))}"
+        f"sqlite:///{os.path.join(INSTANCE_DIR, 'cheetah_insurance.db')}"
     )
-
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # --- Uploads ---
@@ -84,9 +110,9 @@ class Config:
     MERCHANT_CONFIG_TH_CURRENCY = os.getenv("MERCHANT_CONFIG_TH_CURRENCY", "THB")
 
     # --- Certs ---
-    CERT_PATH = os.getenv("CERT_PATH", os.path.join("certs", "cert.cer"))
-    PUBLIC_KEY_PATH = os.getenv("PUBLIC_KEY_PATH", os.path.join("certs", "public-key.cer"))
-    PRIVATE_KEY_PATH = os.getenv("PRIVATE_KEY_PATH", os.path.join("certs", "merchant-private-key.der"))
+    CERT_PATH = os.getenv("CERT_PATH", "/tmp/sandbox-pkcs7.cer")
+    PUBLIC_KEY_PATH = os.getenv("PUBLIC_KEY_PATH", "/tmp/jwt-demo.cer")
+    PRIVATE_KEY_PATH = os.getenv("PRIVATE_KEY_PATH", "/tmp/merchant-private-key.der")
 
     # --- Logging ---
     LOG_LEVEL = os.getenv("LOG_LEVEL", "DEBUG")

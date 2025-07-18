@@ -12,6 +12,7 @@ from backend.config.config import Config
 from backend.models import db, initialize_models, init_app
 from backend.routes import register_blueprints, configure_app
 from backend.services.bigquery_service import BigQueryService
+from backend.utils import decode_secrets  # ✅ decode base64 certs ก่อนใช้งาน
 
 # === Logger Setup ===
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -24,20 +25,18 @@ jwt = JWTManager()
 ALLOWED_ORIGINS = [
     "https://cheetahinsurancebroker.com",
     "http://localhost:3000",
-    "https://63894e1bb428.ngrok-free.app "
+    "https://63894e1bb428.ngrok-free.app"
 ]
 
-def initialize_credentials():
-    credentials_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "/app/config/credentials.json")
-    if not os.path.exists(credentials_path):
-        logger.error(f"❌ Credentials file not found at {credentials_path}. Exiting.")
-        sys.exit(1)
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = credentials_path
-    logger.info(f"✅ GOOGLE_APPLICATION_CREDENTIALS set to {credentials_path}")
 def create_app():
-    initialize_credentials()
+    # ✅ Decode base64 secrets → temp files
+    decode_secrets.decode_env_to_file("SANDBOX_PKCS7_BASE64", "/tmp/sandbox-pkcs7.cer")
+    decode_secrets.decode_env_to_file("PRIVATE_KEY_BASE64", "/tmp/merchant-private-key.der")
+    decode_secrets.decode_env_to_file("PUBLIC_CERT_BASE64", "/tmp/jwt-demo.cer")
+    decode_secrets.decode_env_to_file("GOOGLE_CREDENTIALS_BASE64", "/tmp/credentials.json")
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/tmp/credentials.json"
 
-    # ✅ ระบุ absolute path สำหรับ static folder
+    # ✅ Static folder setup
     app_root = os.path.abspath(os.path.dirname(__file__))
     frontend_build_path = os.path.join(app_root, "../frontend/build")
 
