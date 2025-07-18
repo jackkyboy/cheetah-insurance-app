@@ -1,5 +1,4 @@
 # ✅ ใช้ Python Slim /Users/apichet/Downloads/cheetah-insurance-app/backend/Dockerfile
-# ✅ ใช้ Python 3.10 Slim เป็น Base Image
 # ✅ Base Image: Python 3.10 Slim
 FROM python:3.10-slim
 
@@ -27,14 +26,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY backend/requirements.txt ./requirements.txt
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# ✅ Copy full project (including backend/, frontend/, certs/, etc.)
+# ✅ Copy full project
 COPY . /app
 
-# ✅ Safety check
-RUN test -f backend/__init__.py || (echo "❌ Missing backend/__init__.py" && exit 1)
+# ✅ Safety check: Ensure backend/app.py exists
+RUN test -f backend/app.py || (echo "❌ Missing backend/app.py" && exit 1)
 
 # ✅ Expose Flask API port
 EXPOSE 5000
 
-# ✅ Run app via Gunicorn
+# ✅ Run app via Gunicorn through backend.wsgi:app
 CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "backend.wsgi:app"]
