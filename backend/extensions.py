@@ -1,9 +1,8 @@
 # /Users/apichet/Downloads/cheetah-insurance-app/backend/extensions.py
 # /Users/apichet/Downloads/cheetah-insurance-app/backend/extensions.py
-from flask_caching import Cache
+from backend.db import db  # ✅ import db instance ที่ดึงจาก models/__init__.py
 
-# ✅ ใช้แค่ instance นี้เท่านั้น ห้ามสร้างใหม่ที่อื่น
-cache = Cache(config={"CACHE_TYPE": "SimpleCache"})
+# ...
 
 def init_extensions(app):
     """
@@ -12,10 +11,15 @@ def init_extensions(app):
     # ✅ แนบ cache เข้ากับ app
     cache.init_app(app)
 
-    # ✅ ผูก cache instance เข้ากับ app.extensions แบบปลอดภัย
     if "cache" not in app.extensions:
         app.extensions["cache"] = {}
-
-    # ✅ Bind ทั้ง string และ object ref (กัน KeyError)
     app.extensions["cache"]["default"] = cache
     app.extensions["cache"][cache] = cache
+
+    # ✅ แนบ db เข้ากับ app
+    db.init_app(app)
+
+    if "db" not in app.extensions:
+        app.extensions["db"] = {}
+    app.extensions["db"]["default"] = db
+    app.extensions["db"][db] = db

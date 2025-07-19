@@ -1,0 +1,14 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cheetah-backend
+    restart: always
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env.production
+    volumes:
+      - ./uploads:/app/backend/uploads
+      - ./static:/app/backend/static

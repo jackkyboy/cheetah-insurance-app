@@ -1,8 +1,7 @@
-# ✅ ใช้ Python Slim /Users/apichet/Downloads/cheetah-insurance-app/backend/Dockerfile
-# ✅ Base Image: Python 3.10 Slim
+# ✅ Base Image
 FROM python:3.10-slim
 
-# ✅ Environment Variables
+# ✅ Env Variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     FLASK_ENV=production \
@@ -19,21 +18,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     tesseract-ocr \
     tesseract-ocr-tha \
- && apt-get clean \
- && rm -rf /var/lib/apt/lists/*
+ && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # ✅ Install Python dependencies
-COPY backend/requirements.txt ./requirements.txt
-RUN pip install --upgrade pip && pip install -r requirements.txt
+COPY requirements.txt ./requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# ✅ Copy full project
-COPY . /app
+# ✅ Copy backend code
+COPY . /app/backend
 
-# ✅ Safety check: Ensure backend/app.py exists
-RUN test -f backend/app.py || (echo "❌ Missing backend/app.py" && exit 1)
-
-# ✅ Expose Flask API port
+# ✅ Expose Flask port
 EXPOSE 5000
 
-# ✅ Run app via Gunicorn through backend.wsgi:app
+# ✅ Safety check
+RUN test -f /app/backend/app.py || (echo "❌ Missing backend/app.py" && exit 1)
+
+# ✅ Start app using Gunicorn
 CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "backend.wsgi:app"]
