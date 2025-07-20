@@ -1,57 +1,43 @@
 # /Users/apichet/Downloads/cheetah-insurance-app/backend/models/Documents.py
 import logging
 import os
-from backend.models import db  # Import `db` from `__init__.py`
 from datetime import datetime
+from backend.db import db, Model, Column, Integer, String, Text, Boolean, DateTime, JSON, ForeignKey, relationship
 
 # Configure Logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-class Documents(db.Model):
+class Documents(Model):
     """
     Represents a document associated with a customer.
     """
     __tablename__ = 'Documents'
 
-    # 🆔 Primary Key
-    document_id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment="Primary key for Documents table")
+    # Primary Key
+    document_id = Column(Integer, primary_key=True, autoincrement=True, comment="Primary key for Documents table")
 
-    # 🔗 Foreign Key to Customers
-    customer_id = db.Column(db.Integer, db.ForeignKey('Customers.customer_id'), nullable=False, comment="Foreign key to Customers table")
+    # Foreign Key
+    customer_id = Column(Integer, ForeignKey('Customers.customer_id'), nullable=False, comment="Foreign key to Customers table")
 
-    # 📄 Document metadata
-    document_type = db.Column(db.String(100), nullable=False, comment="Type of the document (e.g., ID_CARD, CAR_REGISTRATION)")
-    file_path = db.Column(db.String(255), nullable=False, comment="File path where the document is stored")
-    ocr_data = db.Column(db.JSON, nullable=True, comment="OCR data extracted from the document, if available")
-    processed = db.Column(db.Boolean, default=False, comment="Indicates if OCR processing has been completed")
-    uploaded_at = db.Column(db.DateTime, default=datetime.utcnow, comment="Timestamp when the document was uploaded")
+    # Metadata
+    document_type = Column(String(100), nullable=False, comment="Type of the document (e.g., ID_CARD, CAR_REGISTRATION)")
+    file_path = Column(String(255), nullable=False, comment="File path where the document is stored")
+    ocr_data = Column(JSON, nullable=True, comment="OCR data extracted from the document, if available")
+    processed = Column(Boolean, default=False, comment="Indicates if OCR processing has been completed")
+    uploaded_at = Column(DateTime, default=datetime.utcnow, comment="Timestamp when the document was uploaded")
 
-    # ✅ Document status (new field)
-    status = db.Column(db.String(50), default="uploaded", nullable=False, comment="Status of the document (e.g., uploaded, verified)")
+    # New field
+    status = Column(String(50), default="uploaded", nullable=False, comment="Status of the document (e.g., uploaded, verified)")
 
-    # 🤝 Relationship to Customer
-    customer = db.relationship(
-        'Customers',
-        back_populates='documents',
-        lazy='select'
-    )
-
-
+    # Relationship
+    customer = relationship('Customers', back_populates='documents', lazy='select')
 
     def to_dict(self):
-        """
-        Converts a document object into a dictionary format for serialization.
-
-        Returns:
-            dict: A dictionary representation of the document.
-        """
         try:
             logger.debug(f"Converting document_id={self.document_id} to dictionary")
-
             file_name = os.path.basename(self.file_path) if self.file_path else None
             file_url = f"/api/documents/uploads/{file_name}" if file_name else None
-
             return {
                 'document_id': self.document_id,
                 'customer_id': self.customer_id,
@@ -69,19 +55,8 @@ class Documents(db.Model):
 
 
 # Service Functions
+
 def upload_document(customer_id, document_type, file_path, ocr_data=None):
-    """
-    Uploads a new document for a customer.
-
-    Args:
-        customer_id (int): The ID of the customer.
-        document_type (str): The type of the document.
-        file_path (str): The file path where the document is stored.
-        ocr_data (dict, optional): OCR data extracted from the document.
-
-    Returns:
-        dict: The uploaded document's details.
-    """
     try:
         logger.debug(f"Uploading document for customer_id={customer_id}, type={document_type}")
         new_document = Documents(
@@ -89,7 +64,7 @@ def upload_document(customer_id, document_type, file_path, ocr_data=None):
             document_type=document_type,
             file_path=file_path,
             ocr_data=ocr_data,
-            processed=bool(ocr_data)  # Mark as processed if OCR data is provided
+            processed=bool(ocr_data)
         )
         db.session.add(new_document)
         db.session.commit()
@@ -102,15 +77,6 @@ def upload_document(customer_id, document_type, file_path, ocr_data=None):
 
 
 def get_documents_by_customer(customer_id):
-    """
-    Retrieves all documents for a specific customer.
-
-    Args:
-        customer_id (int): The ID of the customer.
-
-    Returns:
-        list: A list of dictionaries representing the customer's documents.
-    """
     try:
         logger.debug(f"Fetching documents for customer_id={customer_id}")
         documents = Documents.query.filter_by(customer_id=customer_id).all()
@@ -124,15 +90,6 @@ def get_documents_by_customer(customer_id):
 
 
 def delete_document(document_id):
-    """
-    Deletes a document by its ID.
-
-    Args:
-        document_id (int): The ID of the document to delete.
-
-    Returns:
-        dict: A confirmation message upon successful deletion.
-    """
     try:
         logger.debug(f"Deleting document with ID: {document_id}")
         document = Documents.query.get(document_id)
@@ -140,7 +97,6 @@ def delete_document(document_id):
             logger.warning(f"Document not found: {document_id}")
             raise ValueError("Document not found")
 
-        # Attempt to delete the file from the file system
         if document.file_path and os.path.exists(document.file_path):
             os.remove(document.file_path)
             logger.debug(f"File deleted: {document.file_path}")

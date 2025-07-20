@@ -1,8 +1,10 @@
-from backend.models import db
 from datetime import datetime
+from backend.db import (
+    db, Model, Column, Integer, String, DateTime, Float, Text, ForeignKey, relationship
+)
 
 
-class Claims(db.Model):
+class Claims(Model):
     """
     Represents a claim in the insurance system. Claims are associated with a policy
     (if applicable) and a specific user.
@@ -10,57 +12,59 @@ class Claims(db.Model):
     __tablename__ = 'Claims'
 
     # Columns
-    claim_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    policy_id = db.Column(
-        db.Integer,
-        db.ForeignKey('Customer_Policies.policy_id'),
+    claim_id = Column(Integer, primary_key=True, autoincrement=True)
+
+    policy_id = Column(
+        Integer,
+        ForeignKey('Customer_Policies.policy_id'),
         nullable=True
     )
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey('Users.user_id'),
+
+    user_id = Column(
+        Integer,
+        ForeignKey('Users.user_id'),
         nullable=False
     )
-    claim_date = db.Column(
-        db.DateTime,
+
+    claim_date = Column(
+        DateTime,
         default=db.func.now()
     )
-    claim_status = db.Column(
-        db.String(50),
+
+    claim_status = Column(
+        String(50),
         default='Pending'
     )
-    claim_amount = db.Column(
-        db.Float,
+
+    claim_amount = Column(
+        Float,
         nullable=True
     )
-    claim_description = db.Column(
-        db.Text,
+
+    claim_description = Column(
+        Text,
         nullable=False
     )
-    resolution_date = db.Column(
-        db.DateTime,
+
+    resolution_date = Column(
+        DateTime,
         nullable=True
     )
 
     # Relationships
-    policy = db.relationship(
+    policy = relationship(
         'CustomerPolicies',
         backref='claims',
         lazy='joined'
     )
-    user = db.relationship(
+
+    user = relationship(
         'Users',
         backref='claims',
         lazy='joined'
     )
 
     def to_dict(self):
-        """
-        Converts the Claims object to a dictionary for JSON serialization.
-
-        Returns:
-            dict: A dictionary representation of the claim.
-        """
         return {
             "claim_id": self.claim_id,
             "policy_id": self.policy_id,

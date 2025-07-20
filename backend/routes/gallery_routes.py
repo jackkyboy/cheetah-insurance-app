@@ -154,7 +154,7 @@ def get_packages():
 @gallery_api_bp.route("/car-models", methods=["GET"])
 def get_car_models():
     try:
-        client = current_app.extensions["bigquery_config"].client
+        client = current_app.extensions["bigquery_service"].client
         brand = (request.args.get("brand") or "").strip()
 
         if not brand:
@@ -180,6 +180,7 @@ def get_car_models():
     except Exception as e:
         current_app.logger.error(f"❌ Error in /car-models: {e}")
         return jsonify({"error": str(e)}), 500
+
 
 
 

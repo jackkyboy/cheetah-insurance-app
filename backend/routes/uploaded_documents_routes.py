@@ -4,6 +4,7 @@ from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity, get_jwt
 from werkzeug.utils import secure_filename
 from flask_jwt_extended import verify_jwt_in_request, get_jwt
 from backend.models.Documents import Documents
+from backend.models.Customers import Customers
 from backend.models import db
 import logging
 import os
@@ -90,18 +91,23 @@ def _check_user_access(user, customer_id):
     """Check if the user has access to the specified customer."""
     try:
         if user["role"] == "admin":
-            logger.info(f"✅ Admin access granted: admin_id={user['admin_id']}")  # ✅ LOG Admin Access
+            logger.info(f"✅ Admin access granted: admin_id={user['admin_id']}")
             return True
 
         user_id = user["user_id"]
         user_obj = Users.query.filter_by(user_id=user_id).first()
-
         if not user_obj:
             logger.warning(f"❌ User not found: user_id={user_id}")
             return False
 
-        if str(user_obj.customer_id) != str(customer_id):
-            logger.warning(f"❌ Unauthorized access attempt: user_id={user_id}, customer_id={customer_id}")
+        # ✅ แก้ตรงนี้: ดึง Customers โดยใช้ user_id
+        customer_obj = Customers.query.filter_by(user_id=user_id).first()
+        if not customer_obj:
+            logger.warning(f"❌ No customer record found for user_id={user_id}")
+            return False
+
+        if str(customer_obj.customer_id) != str(customer_id):
+            logger.warning(f"❌ Unauthorized access: customer_id mismatch ({customer_obj.customer_id} != {customer_id})")
             return False
 
         return True

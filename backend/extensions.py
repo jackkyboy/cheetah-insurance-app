@@ -1,13 +1,16 @@
 # /Users/apichet/Downloads/cheetah-insurance-app/backend/extensions.py
 # /Users/apichet/Downloads/cheetah-insurance-app/backend/extensions.py
-from backend.db import db  # ✅ import db instance ที่ดึงจาก models/__init__.py
+from flask_caching import Cache
+from backend.db import db  # ✅ import db instance จาก models/__init__.py
 
-# ...
+# ✅ สร้าง cache instance
+cache = Cache(config={"CACHE_TYPE": "SimpleCache"})
 
 def init_extensions(app):
     """
     Initialize and register all extensions with the Flask app.
     """
+
     # ✅ แนบ cache เข้ากับ app
     cache.init_app(app)
 
@@ -23,3 +26,6 @@ def init_extensions(app):
         app.extensions["db"] = {}
     app.extensions["db"]["default"] = db
     app.extensions["db"][db] = db
+
+# ✅ สำหรับให้ import จากภายนอกได้ เช่น `from backend.extensions import cache, db`
+__all__ = ["cache", "db"]

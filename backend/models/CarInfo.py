@@ -1,5 +1,7 @@
 # /Users/apichet/Downloads/cheetah-insurance-app/backend/models/CarInfo.py
-from backend.models import db
+from backend.db import (
+    db, Model, Column, Integer, String, ForeignKey, DateTime, relationship
+)
 import logging
 
 # Configure Logging
@@ -7,35 +9,22 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
-class CarInfo(db.Model):
+class CarInfo(Model):
     """
     Represents information about a customer's car.
     """
     __tablename__ = 'CarInfo'
 
-    # Columns
-    car_id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment="Primary key for CarInfo table")
-    car_brand = db.Column(db.String(100), nullable=False, comment="Brand of the car (e.g., Honda)")
-    car_model = db.Column(db.String(100), nullable=False, comment="Model of the car (e.g., Civic)")
-    car_year = db.Column(db.String(4), nullable=False, comment="Year the car was manufactured")
-    car_submodel = db.Column(db.String(100), nullable=True, comment="Submodel of the car (optional)")
-    customer_id = db.Column(db.Integer, db.ForeignKey('Customers.customer_id'), nullable=False, comment="Foreign key to Customers table")
+    car_id = Column(Integer, primary_key=True, autoincrement=True, comment="Primary key for CarInfo table")
+    car_brand = Column(String(100), nullable=False, comment="Brand of the car (e.g., Honda)")
+    car_model = Column(String(100), nullable=False, comment="Model of the car (e.g., Civic)")
+    car_year = Column(String(4), nullable=False, comment="Year the car was manufactured")
+    car_submodel = Column(String(100), nullable=True, comment="Submodel of the car (optional)")
+    customer_id = Column(Integer, ForeignKey('Customers.customer_id'), nullable=False, comment="Foreign key to Customers table")
 
-    # Relationships
-    customer = db.relationship(
-        'Customers',
-        back_populates='car_info',
-        lazy='joined'
-    )
-
+    customer = relationship('Customers', back_populates='car_info', lazy='joined')
 
     def to_dict(self):
-        """
-        Converts the CarInfo object into a dictionary for serialization.
-
-        Returns:
-            dict: A dictionary representation of the car information.
-        """
         logger.debug(f"Converting CarInfo ID {self.car_id} to dictionary.")
         return {
             'car_id': self.car_id,
@@ -45,6 +34,7 @@ class CarInfo(db.Model):
             'car_submodel': self.car_submodel,
             'customer_id': self.customer_id
         }
+
 
 
 # Service Functions

@@ -1,32 +1,28 @@
 # /Users/apichet/Downloads/cheetah-insurance-app/backend/models/InsuranceReviews.py
-from backend.models import db  # Import `db` from `__init__.py`
+from backend.db import db, Model, Column, Integer, Text, DateTime, ForeignKey, relationship, backref, func
 import logging
-from sqlalchemy.orm import relationship
-from sqlalchemy import ForeignKey
 
 # Configure Logging
 logger = logging.getLogger(__name__)
 
-class InsuranceReviews(db.Model):
+
+class InsuranceReviews(Model):
     __tablename__ = 'insurance_reviews'
 
-    review_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    customer_id = db.Column(db.Integer, ForeignKey('Customers.customer_id', ondelete="CASCADE"), nullable=False)
-    package_id = db.Column(db.Integer, ForeignKey('Car_Insurance_Packages.package_id', ondelete="CASCADE"), nullable=False)
-    company_id = db.Column(db.Integer, ForeignKey('Insurance_Companies.company_id', ondelete="CASCADE"), nullable=False)
-    rating = db.Column(db.Integer, nullable=False)  # Rating (1-5)
-    comment = db.Column(db.Text, nullable=True)  # Optional customer comment
-    review_date = db.Column(db.DateTime, default=db.func.now(), nullable=False)
+    review_id = Column(Integer, primary_key=True, autoincrement=True)
+    customer_id = Column(Integer, ForeignKey('Customers.customer_id', ondelete="CASCADE"), nullable=False)
+    package_id = Column(Integer, ForeignKey('Car_Insurance_Packages.package_id', ondelete="CASCADE"), nullable=False)
+    company_id = Column(Integer, ForeignKey('Insurance_Companies.company_id', ondelete="CASCADE"), nullable=False)
+    rating = Column(Integer, nullable=False)
+    comment = Column(Text, nullable=True)
+    review_date = Column(DateTime, default=func.now(), nullable=False)
 
     # Relationships
-    customer = relationship('Customers', backref=db.backref('insurance_reviews', cascade="all, delete-orphan", lazy=True))
-    package = relationship('CarInsurancePackages', backref=db.backref('insurance_reviews', cascade="all, delete-orphan", lazy=True))
-    company = relationship('InsuranceCompanies', backref=db.backref('insurance_reviews', cascade="all, delete-orphan", lazy=True))
+    customer = relationship('Customers', backref=backref('insurance_reviews', cascade="all, delete-orphan", lazy=True))
+    package = relationship('CarInsurancePackages', backref=backref('insurance_reviews', cascade="all, delete-orphan", lazy=True))
+    company = relationship('InsuranceCompanies', backref=backref('insurance_reviews', cascade="all, delete-orphan", lazy=True))
 
     def to_dict(self):
-        """
-        Convert review data to a dictionary format.
-        """
         return {
             "review_id": self.review_id,
             "customer_id": self.customer_id,
@@ -38,13 +34,9 @@ class InsuranceReviews(db.Model):
         }
 
 
+# Review Service Functions
 
-
-# Functions for managing reviews
 def add_review(customer_id, package_id, company_id, rating, comment=None):
-    """
-    Add a new review.
-    """
     try:
         logger.debug(f"Adding review for customer_id={customer_id}, package_id={package_id}, company_id={company_id}, rating={rating}")
 
@@ -70,13 +62,9 @@ def add_review(customer_id, package_id, company_id, rating, comment=None):
 
 
 def get_reviews_for_package(package_id):
-    """
-    Fetch all reviews for a specific package ID.
-    """
     try:
         logger.debug(f"Fetching reviews for package_id={package_id}")
         reviews = InsuranceReviews.query.filter_by(package_id=package_id).all()
-
         logger.info(f"Found {len(reviews)} reviews for package_id={package_id}")
         return [review.to_dict() for review in reviews]
     except Exception as e:
@@ -85,13 +73,9 @@ def get_reviews_for_package(package_id):
 
 
 def get_reviews_by_customer(customer_id):
-    """
-    Fetch all reviews by a specific customer.
-    """
     try:
         logger.debug(f"Fetching reviews for customer_id={customer_id}")
         reviews = InsuranceReviews.query.filter_by(customer_id=customer_id).all()
-
         logger.info(f"Found {len(reviews)} reviews for customer_id={customer_id}")
         return [review.to_dict() for review in reviews]
     except Exception as e:
@@ -100,12 +84,7 @@ def get_reviews_by_customer(customer_id):
 
 
 def get_reviews_summary():
-    """
-    Fetch a summary of reviews, including average rating and review count for each company.
-    """
     try:
-        from sqlalchemy import func
-
         logger.debug("Fetching review summary grouped by company_id")
         summary = db.session.query(
             InsuranceReviews.company_id,

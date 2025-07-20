@@ -1,71 +1,41 @@
 # /Users/apichet/Downloads/cheetah-insurance-app/backend/models/Customers.py
-from datetime import datetime, timedelta
-from backend.models import db  # Import `db` from `__init__.py`
-from backend.models.CustomerPolicies import CustomerPolicies
+from datetime import datetime
 import logging
+from backend.db import (
+    db, Model, Column, Integer, String, Text, DateTime, ForeignKey, relationship
+)
 
-# ตั้งค่า Logging
+# Logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
-class Customers(db.Model):
+class Customers(Model):
     """
     Represents a Customer entity in the application.
     """
     __tablename__ = 'Customers'
 
-    # Columns
-    # Columns
-    customer_id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment="Primary key for the Customers table")
-    first_name = db.Column(db.String(50), nullable=False, comment="Customer's first name")
-    last_name = db.Column(db.String(50), nullable=False, comment="Customer's last name")
-    email = db.Column(db.String(255), unique=True, nullable=False, comment="Customer's unique email address")
-    phone_number = db.Column(db.String(20), nullable=True, comment="Customer's phone number")
-    address = db.Column(db.Text, nullable=True, comment="Customer's physical address")
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, comment="Timestamp when the customer was created")
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, comment="Timestamp when the customer was last updated")
+    customer_id = Column(Integer, primary_key=True, autoincrement=True, comment="Primary key for the Customers table")
+    first_name = Column(String(50), nullable=False, comment="Customer's first name")
+    last_name = Column(String(50), nullable=False, comment="Customer's last name")
+    email = Column(String(255), unique=True, nullable=False, comment="Customer's unique email address")
+    phone_number = Column(String(20), nullable=True, comment="Customer's phone number")
+    address = Column(Text, nullable=True, comment="Customer's physical address")
+    created_at = Column(DateTime, default=datetime.utcnow, comment="Timestamp when the customer was created")
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, comment="Timestamp when the customer was last updated")
 
-    # ✅ เพิ่ม ForeignKey → Users
-    user_id = db.Column(db.Integer, db.ForeignKey('Users.user_id'), nullable=False, unique=True, comment="Foreign key to Users table (1:1 relationship)")
-
+    # Foreign key to Users
+    user_id = Column(Integer, ForeignKey('Users.user_id'), nullable=False, unique=True, comment="Foreign key to Users table (1:1 relationship)")
 
     # Relationships
-    user = db.relationship(
-        'Users',
-        back_populates='customer',
-        uselist=False,
-        lazy='joined'
-    )
-    documents = db.relationship(
-        'Documents',
-        back_populates='customer',
-        cascade='all, delete-orphan',
-        lazy='select'
-    )
-    car_info = db.relationship(
-        'CarInfo',
-        back_populates='customer',
-        cascade='all, delete-orphan',
-        lazy='select'
-    )
-    policies = db.relationship(
-        'CustomerPolicies',
-        back_populates='customer',
-        cascade='all, delete-orphan',
-        lazy='select'
-    )
-    policy_requests = db.relationship(
-        'PolicyRequests',
-        back_populates='customer',
-        cascade='all, delete-orphan',
-        lazy='select'
-    )
+    user = relationship('Users', back_populates='customer', uselist=False, lazy='joined')
+    documents = relationship('Documents', back_populates='customer', cascade='all, delete-orphan', lazy='select')
+    car_info = relationship('CarInfo', back_populates='customer', cascade='all, delete-orphan', lazy='select')
+    policies = relationship('CustomerPolicies', back_populates='customer', cascade='all, delete-orphan', lazy='select')
+    policy_requests = relationship('PolicyRequests', back_populates='customer', cascade='all, delete-orphan', lazy='select')
 
     def to_dict(self):
-        """
-        Converts the Customer object to a dictionary for JSON serialization.
-        """
         logger.debug(f"Converting customer_id={self.customer_id} to dictionary.")
         try:
             return {
@@ -88,15 +58,6 @@ class Customers(db.Model):
 
     @staticmethod
     def find_by_email(email):
-        """
-        Finds a customer by their email address.
-
-        Args:
-            email (str): The email address of the customer.
-
-        Returns:
-            Customers: The customer object if found, or None if not found.
-        """
         logger.debug(f"Finding customer by email: {email}")
         try:
             return Customers.query.filter_by(email=email).first()
@@ -106,16 +67,6 @@ class Customers(db.Model):
 
     @staticmethod
     def update_customer(customer_id, **kwargs):
-        """
-        Updates customer information.
-
-        Args:
-            customer_id (int): The ID of the customer to update.
-            **kwargs: Key-value pairs of fields to update.
-
-        Returns:
-            dict: The updated customer data.
-        """
         logger.debug(f"Updating customer_id={customer_id} with {kwargs}")
         try:
             customer = Customers.query.get(customer_id)
@@ -136,15 +87,6 @@ class Customers(db.Model):
 
     @staticmethod
     def delete_customer(customer_id):
-        """
-        Deletes a customer by their ID.
-
-        Args:
-            customer_id (int): The ID of the customer to delete.
-
-        Returns:
-            dict: A success message upon successful deletion.
-        """
         logger.debug(f"Deleting customer_id={customer_id}")
         try:
             customer = Customers.query.get(customer_id)

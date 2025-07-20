@@ -1,10 +1,9 @@
 # /Users/apichet/Downloads/cheetah-insurance-app/backend/models/__init__.py
+# /Users/apichet/Downloads/cheetah-insurance-app/backend/models/__init__.py
+# /Users/apichet/Downloads/cheetah-insurance-app/backend/models/__init__.py
 import importlib
 import logging
-from flask_sqlalchemy import SQLAlchemy
-
-# Initialize SQLAlchemy
-db = SQLAlchemy()
+from backend.db import db  # ✅ ใช้ db instance เดียวจาก backend/db.py
 
 # Configure Logging
 logging.basicConfig(level=logging.DEBUG)
@@ -45,14 +44,12 @@ def initialize_models():
 
 def init_app(app):
     """Initialize SQLAlchemy with the Flask app."""
-    # ✅ Ensure only one SQLAlchemy instance is initialized
     if not hasattr(app, 'extensions') or 'sqlalchemy' not in app.extensions:
         db.init_app(app)
         logger.debug("✅ SQLAlchemy initialized with Flask App")
     else:
         logger.debug("⚠️ SQLAlchemy already initialized with Flask App")
 
-    # ✅ Ensure the app context is active when creating tables
     with app.app_context():
         try:
             db.create_all()
@@ -62,33 +59,27 @@ def init_app(app):
 
 
 class BaseModel(db.Model):
-    """
-    Base model for common fields and methods across all models.
-    """
-    __abstract__ = True  # This tells SQLAlchemy not to create a table for this model
+    __abstract__ = True
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp(), nullable=False)
     updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp(), nullable=False)
 
     def save(self):
-        """Save instance to database"""
         try:
             db.session.add(self)
             db.session.commit()
-            logger.debug(f"✅ Successfully saved {self.__class__.__name__} instance to database.")
+            logger.debug(f"✅ Saved {self.__class__.__name__}")
         except Exception as e:
             db.session.rollback()
-            logger.error(f"❌ Error saving {self.__class__.__name__}: {e}")
+            logger.error(f"❌ Save error on {self.__class__.__name__}: {e}")
 
     def delete(self):
-        """Delete instance from database"""
         try:
             db.session.delete(self)
             db.session.commit()
-            logger.debug(f"✅ Successfully deleted {self.__class__.__name__} instance from database.")
+            logger.debug(f"✅ Deleted {self.__class__.__name__}")
         except Exception as e:
             db.session.rollback()
-            logger.error(f"❌ Error deleting {self.__class__.__name__}: {e}")
+            logger.error(f"❌ Delete error on {self.__class__.__name__}: {e}")
 
     def to_dict(self):
-        """Convert model to dictionary"""
-        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}

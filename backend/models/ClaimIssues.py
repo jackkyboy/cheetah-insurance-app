@@ -1,69 +1,77 @@
 # /Users/apichet/Downloads/cheetah-insurance-app/backend/models/ClaimIssues.py
 import logging
-from backend.models import db  # Import `db` from `__init__.py`
+from backend.db import (
+    db, Model, Column, Integer, String, DateTime, Text, ForeignKey, relationship
+)
 
 # Configure Logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-class ClaimIssues(db.Model):
+
+class ClaimIssues(Model):
     __tablename__ = 'Claim_Issues'
 
-    issue_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    policy_id = db.Column(
-        db.Integer,
-        db.ForeignKey('Customer_Policies.policy_id'),
-        nullable=True,  # Allow policy_id to be NULL
+    issue_id = Column(Integer, primary_key=True, autoincrement=True)
+
+    policy_id = Column(
+        Integer,
+        ForeignKey('Customer_Policies.policy_id'),
+        nullable=True,
         comment="Foreign key referencing Customer_Policies. Nullable for general claims."
     )
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey('Users.user_id'),
+
+    user_id = Column(
+        Integer,
+        ForeignKey('Users.user_id'),
         nullable=False,
         comment="Foreign key referencing Users"
     )
-    issue_description = db.Column(
-        db.Text,
+
+    issue_description = Column(
+        Text,
         nullable=False,
         comment="Detailed description of the issue"
     )
-    issue_date = db.Column(
-        db.DateTime,
+
+    issue_date = Column(
+        DateTime,
         default=db.func.now(),
         comment="Date when the issue was reported"
     )
-    status = db.Column(
-        db.String(50),
+
+    status = Column(
+        String(50),
         default='pending',
         comment="Status of the issue (e.g., pending, resolved, escalated)"
     )
-    insurance_response = db.Column(
-        db.Text,
+
+    insurance_response = Column(
+        Text,
         nullable=True,
         comment="Response from the insurance company"
     )
-    resolution_date = db.Column(
-        db.DateTime,
+
+    resolution_date = Column(
+        DateTime,
         nullable=True,
         comment="Date when the issue was resolved"
     )
 
     # Relationships
-    policy = db.relationship(
+    policy = relationship(
         'CustomerPolicies',
         backref='claim_issues',
         lazy=True
     )
-    user = db.relationship(
+
+    user = relationship(
         'Users',
         backref='claim_issues',
         lazy=True
     )
 
     def to_dict(self):
-        """
-        Converts the ClaimIssues object into a dictionary for JSON serialization.
-        """
         try:
             return {
                 "issue_id": self.issue_id,

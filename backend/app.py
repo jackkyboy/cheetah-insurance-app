@@ -1,42 +1,54 @@
 # /Users/apichet/Downloads/cheetah-insurance-app/backend/app.py
+# backend/app.py
 import os
-import sys
 import logging
 from flask import Flask, jsonify, current_app, request, send_from_directory
 from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
-from flask_caching import Cache
 
 from backend.config.config import Config
-from backend.models import db, initialize_models, init_app
+from backend.db import db
+from backend.extensions import cache
+from backend.models import initialize_models, init_app
 from backend.routes import register_blueprints, configure_app
 from backend.services.bigquery_service import BigQueryService
-from backend.utils import decode_secrets  # ✅ decode base64 certs ก่อนใช้งาน
+from backend.utils import decode_secrets
 
 # === Logger Setup ===
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
-# === Global Extensions
-cache = Cache(config={"CACHE_TYPE": "SimpleCache", "CACHE_DEFAULT_TIMEOUT": 300})
 jwt = JWTManager()
 
 ALLOWED_ORIGINS = [
-    "https://cheetahinsurancebroker.com",
     "http://localhost:3000",
-    "https://63894e1bb428.ngrok-free.app"
+    "http://localhost:3001",  # ✅ เพิ่มอันนี้
+    "http://127.0.0.1:5000",
+    "http://localhost:5000",
+    "http://localhost",
+    "http://0.0.0.0",
+    "https://cheetahinsurancebroker.com",
+    "https://app.cheetahinsurancebroker.com",
+    "https://api.cheetahinsurancebroker.com"
 ]
 
-def create_app():
-    # ✅ Decode base64 secrets → temp files
-    decode_secrets.decode_env_to_file("SANDBOX_PKCS7_BASE64", "/tmp/sandbox-pkcs7.cer")
-    decode_secrets.decode_env_to_file("PRIVATE_KEY_BASE64", "/tmp/merchant-private-key.der")
-    decode_secrets.decode_env_to_file("PUBLIC_CERT_BASE64", "/tmp/jwt-demo.cer")
-    decode_secrets.decode_env_to_file("GOOGLE_CREDENTIALS_BASE64", "/tmp/credentials.json")
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/tmp/credentials.json"
 
-    # ✅ Static folder setup
+
+
+def create_app():
+    # === Decode Base64 .env Secrets ===
+    secrets = {
+        "SANDBOX_PKCS7_BASE64": "/tmp/sandbox-pkcs7.cer",
+        "PRIVATE_KEY_BASE64": "/tmp/merchant-private-key.der",
+        "PUBLIC_CERT_BASE64": "/tmp/jwt-demo.cer",
+        "GOOGLE_CREDENTIALS_BASE64": "/tmp/credentials.json"
+    }
+    for env_key, file_path in secrets.items():
+        decode_secrets.decode_env_to_file(env_key, file_path)
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = secrets["GOOGLE_CREDENTIALS_BASE64"]
+
+    # === Initialize Flask App ===
     app_root = os.path.abspath(os.path.dirname(__file__))
     frontend_build_path = os.path.join(app_root, "../frontend/build")
 
@@ -44,6 +56,7 @@ def create_app():
     app.config.from_object(Config)
     logger.info(f"🚀 Starting Flask application with static folder: {frontend_build_path}")
 
+    # === Register System ===
     init_extensions(app)
     configure_app(app)
     register_blueprints(app)
@@ -54,12 +67,13 @@ def create_app():
 
     return app
 
-
 def init_extensions(app):
     cache.init_app(app)
     app.extensions.setdefault("cache", {})["default"] = cache
+
     CORS(app, origins=ALLOWED_ORIGINS, supports_credentials=True)
     app.after_request(add_cors_headers)
+
     jwt.init_app(app)
     init_app(app)
     Migrate(app, db)
@@ -79,18 +93,16 @@ def register_services(app):
         except Exception as e:
             logger.error(f"❌ BigQueryService error: {e}")
 
-# === React SPA fallback route
 def register_spa_fallback(app):
     @app.route("/", defaults={"path": ""})
     @app.route("/<path:path>")
     def serve_react(path):
         try:
             full_path = os.path.join(app.static_folder, path)
-
             if path != "" and os.path.exists(full_path):
                 logger.info(f"🟢 Serving static file: {full_path}")
                 return send_from_directory(app.static_folder, path)
-            
+
             index_path = os.path.join(app.static_folder, "index.html")
             if not os.path.exists(index_path):
                 logger.error("❌ index.html not found in frontend build folder!")
@@ -103,9 +115,6 @@ def register_spa_fallback(app):
             logger.error(f"❌ Error serving static file: {e}")
             return "Something went wrong", 500
 
-
-
-# === CORS Header Handler
 def add_cors_headers(response):
     origin = request.headers.get("Origin")
     if origin in ALLOWED_ORIGINS:
@@ -115,7 +124,6 @@ def add_cors_headers(response):
         response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
     return response
 
-# === JWT Error Handlers
 def setup_jwt_error_handlers(jwt):
     @jwt.expired_token_loader
     def expired_token_callback(jwt_header, jwt_payload):
@@ -133,7 +141,6 @@ def setup_jwt_error_handlers(jwt):
     def needs_fresh_token_callback(jwt_header, jwt_payload):
         return jsonify({"error": "Fresh token required"}), 401
 
-# === CLI Tools
 def setup_cli_utilities(app):
     @app.cli.command("list-routes")
     def list_routes():
@@ -145,11 +152,9 @@ def setup_cli_utilities(app):
             function = current_app.view_functions[rule.endpoint].__name__
             print(f"{methods:<10} {str(rule):<50} {function:<50}")
 
-# === Main Entrypoint
 if __name__ == "__main__":
     try:
         app = create_app()
-
         print("\n📦 Registered Routes:")
         for rule in app.url_map.iter_rules():
             methods = ','.join(rule.methods)

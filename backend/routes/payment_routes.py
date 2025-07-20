@@ -64,47 +64,35 @@ def create_payment():
     try:
         logger.info("🔍 Received request to create payment.")
 
-        # Extract user_id from JWT
+        # 🔐 Extract user identity
         user_id = get_jwt_identity()
-        logger.debug(f"🔑 JWT user_id extracted: {user_id}")
         if not user_id:
             logger.warning("❌ Unauthorized access: Missing user ID.")
             return jsonify({"error": "Unauthorized"}), 401
 
-        # Parse and sanitize input data
+        # 📥 Parse request payload
         data = request.json or {}
         logger.debug(f"📥 Request payload: {data}")
 
-        # Sanitize `package_id`
-        package_id = data.get("package_id")
-        if package_id == "undefined" or package_id is None:
+        # 🧼 Sanitize `package_id`
+        try:
+            package_id = int(data.get("package_id"))
+        except (ValueError, TypeError):
             package_id = None
-        else:
-            try:
-                package_id = int(package_id)
-            except ValueError:
-                package_id = None
+        data["package_id"] = package_id
 
-        data["package_id"] = package_id  # Update sanitized value back into payload
-
-        # Validate `customer_id`
+        # 🔍 Validate customer ID
         customer_id = data.get("customer_id")
         if not customer_id:
-            logger.warning("❌ Missing customer_id in payload.")
             return jsonify({"error": "Customer ID is required"}), 400
 
-        # Define required fields based on `package_id`
-        required_fields = ["amount"]
-        if not package_id:
-            required_fields += ["insurance_type", "car_brand", "car_model"]
-
-        # Validate input
-        is_valid, error_message = validate_payment_input(data, required_fields)
+        # ✅ Validate required fields
+        required_fields = ["amount"] + ([] if package_id else ["insurance_type", "car_brand", "car_model"])
+        is_valid, error_msg = validate_payment_input(data, required_fields)
         if not is_valid:
-            logger.warning(f"❌ Validation error: {error_message}")
-            return jsonify({"error": error_message}), 400
+            return jsonify({"error": error_msg}), 400
 
-        # Prepare payment details
+        # 🧾 Prepare payment metadata
         package_data = {
             "amount": data["amount"],
             "currency": data.get("currency", "THB"),
@@ -113,26 +101,22 @@ def create_payment():
             "insurance_type": data.get("insurance_type"),
             "car_brand": data.get("car_brand"),
             "car_model": data.get("car_model"),
-            "car_submodel": data.get("car_submodel"),  # เพิ่ม car_submodel
-            "car_year": data.get("car_year"),          # เพิ่ม car_year
+            "car_submodel": data.get("car_submodel"),
+            "car_year": data.get("car_year"),
             "description": data.get("description", "Custom Payment"),
+            "package_id": package_id,
         }
-
-
-        if package_id:
-            package_data["package_id"] = package_id
 
         logger.info(f"💡 Payment details: {package_data}")
 
-        # Create payment order
+        # 🏗️ Create payment order
         payment_order = PaymentService.create_payment_order(customer_id, package_data)
         if not payment_order:
-            logger.error("❌ Failed to create payment order.")
             return jsonify({"error": "Failed to create payment order"}), 500
 
         logger.info(f"✅ Payment order created: {payment_order}")
 
-        # Generate payment token
+        # 🔐 Generate payment token
         payment_token = PaymentService.create_payment_token(
             invoice_no=payment_order["order_id"],
             amount=package_data["amount"],
@@ -141,21 +125,21 @@ def create_payment():
             user_id=user_id,
         )
         if not payment_token:
-            logger.error("❌ Failed to generate payment token.")
             return jsonify({"error": "Failed to generate payment token"}), 500
 
-        logger.info(f"✅ Payment token generated: {payment_token}")
+        logger.info(f"✅ Payment token generated")
 
-        # Return Payment Details
+        # 🧾 Return final response
         return jsonify({
             "message": "Payment order created successfully",
             "payment_order": payment_order,
-            "payment_token": payment_token,
+            "payload": payment_token,  # ✅ Fix key: payload
         }), 201
 
     except Exception as e:
-        logger.error(f"❌ Unexpected error occurred: {e}", exc_info=True)
+        logger.exception("❌ Unexpected error occurred during payment creation")
         return jsonify({"error": "An error occurred while creating payment"}), 500
+
 
 
     
@@ -327,8 +311,9 @@ def get_orders_by_customer(customer_id):
             logger.warning(f"❌ Customer ID {customer_id} not found in DB.")
             return jsonify({"error": "Customer not found"}), 404
 
-        if customer.user_id != user_id:
-            logger.warning(f"⛔ Access denied: user_id={user_id} does not own customer_id={customer_id}")
+        # ✅ Fix: Compare user_id with casting to same type
+        if str(customer.user_id) != str(user_id):
+            logger.warning(f"⛔ Access denied: user_id={user_id} does not own customer_id={customer_id} (DB owner: {customer.user_id})")
             return jsonify({"error": "Access denied"}), 403
 
         orders = Payments.query.filter_by(customer_id=customer_id).all()

@@ -5,8 +5,9 @@ import os
 import uuid
 import urllib.parse
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 import requests
+import jwt
 from flask import Flask
 from flask_cors import CORS
 from backend.models.Payments import Payments
@@ -48,43 +49,40 @@ class PaymentService:
     @staticmethod
     def create_payment_order(customer_id, package_data):
         """
-        Creates a new payment order.
-
-        Args:
-            customer_id (int): ID of the customer.
-            package_data (dict): Additional payment details.
-
-        Returns:
-            dict: A dictionary representation of the created payment.
+        Creates a new payment order with a formatted invoice_no instead of UUID.
         """
-        try:
-            logger.debug(f"🚀 Starting to create payment order. Customer ID: {customer_id}, Package Data: {package_data}")
-
+        def validate_input():
             if not customer_id:
-                logger.warning("⚠️ Customer ID is missing.")
                 raise ValueError("❌ Customer ID is required.")
 
-            order_id = str(uuid.uuid4())
-            logger.debug(f"🔧 Generated order ID: {order_id} for customer_id={customer_id}")
+            if not isinstance(package_data, dict):
+                raise ValueError("❌ Package data must be a dictionary.")
 
             amount = package_data.get("amount", 0)
             if amount <= 0:
-                logger.warning(f"⚠️ Invalid amount: {amount} for order_id={order_id}")
                 raise ValueError("❌ Amount must be greater than 0.")
 
             package_id = package_data.get("package_id")
-            if package_id is not None and not isinstance(package_id, int):
-                logger.warning(f"⚠️ Invalid package ID: {package_id} for order_id={order_id}")
-                raise ValueError("❌ Package ID must be an integer or null.")
+            if package_id is not None and not isinstance(package_id, (str, int)):
+                raise ValueError("❌ Package ID must be a string or integer.")
 
             add_ons = package_data.get("add_ons", [])
             if not isinstance(add_ons, list):
-                logger.warning(f"⚠️ Invalid add-ons format: {add_ons} for order_id={order_id}")
                 raise ValueError("❌ Add-ons must be a list.")
-            add_ons_str = ",".join(map(str, add_ons))
 
-            logger.debug(f"📋 Payment Details - Amount: {amount}, Package ID: {package_id}, Add-ons: {add_ons_str}")
+            return amount, package_id, ",".join(map(str, add_ons))
 
+        try:
+            logger.debug(f"🚀 Creating payment order | customer_id={customer_id} | package_data={package_data}")
+
+            # ✅ Input validation
+            amount, package_id, add_ons_str = validate_input()
+
+            # ✅ Generate formatted invoice_no (useful as order_id)
+            order_id = f"INV{datetime.utcnow().strftime('%Y%m%d%H%M%S')}"
+            logger.debug(f"🔧 Generated order_id={order_id}")
+
+            # ✅ Build payment object
             payment = Payments(
                 order_id=order_id,
                 customer_id=customer_id,
@@ -110,62 +108,54 @@ class PaymentService:
             db.session.add(payment)
             db.session.commit()
 
-            logger.info(f"✅ Payment order created successfully: {order_id}")
+            logger.info(f"✅ Payment order created | order_id={order_id}")
             return payment.to_dict()
 
         except ValueError as ve:
-            logger.error(f"❌ Validation error for customer_id={customer_id}: {ve}")
+            logger.error(f"❌ Validation error | customer_id={customer_id} | {ve}")
             raise ve
         except Exception as e:
             db.session.rollback()
-            logger.exception(f"❌ Error creating payment order for customer_id={customer_id}: {str(e)}")
+            logger.exception(f"❌ Unexpected error during payment order creation | customer_id={customer_id}")
             raise Exception(f"Error creating payment order: {str(e)}")
+
+
 
 
 
     @staticmethod
     def create_payment_token(invoice_no, amount, description="Payment", country_code="TH", user_id=None, role=None):
         """
-        Generates a payment token for 2C2P.
-
-        Args:
-            invoice_no (str): Unique invoice number for the transaction.
-            amount (float): Transaction amount.
-            description (str, optional): Payment description. Defaults to "Payment".
-            country_code (str, optional): Country code for the transaction. Defaults to "TH".
-            user_id (int): ID of the user initiating the payment.
-            role (str, optional): User role ("user" or "admin"). Defaults to "user".
-
-        Returns:
-            dict: Response from the 2C2P API containing the payment token.
+        Generates a payment token for 2C2P and wraps it in a JWT for frontend use.
         """
         logger.debug("🔧 Generating payment token...")
         try:
-            # Validate required environment variables
+            # ✅ Load environment variables
             merchant_id = os.getenv("MERCHANT_CONFIG_TH_ID")
-            secret_key = os.getenv("MERCHANT_CONFIG_TH_SECRET")
+            secret_key_2c2p = os.getenv("MERCHANT_CONFIG_TH_SECRET")
+            jwt_secret = os.getenv("JWT_SECRET_KEY")
             api_url = os.getenv("SANDBOX_API_URL", "https://sandbox-pgw.2c2p.com/payment/4.3/paymentToken")
 
-            if not merchant_id or not secret_key:
-                logger.error("❌ Missing environment variables: MERCHANT_CONFIG_TH_ID or MERCHANT_CONFIG_TH_SECRET.")
-                raise EnvironmentError("Merchant ID and Secret Key are required for generating payment tokens.")
+            if not merchant_id or not secret_key_2c2p:
+                raise EnvironmentError("❌ Missing 2C2P merchant credentials.")
 
-            # Validate required arguments
+            if not jwt_secret:
+                raise EnvironmentError("❌ JWT_SECRET_KEY is required.")
+
             if not user_id:
-                raise ValueError("❌ User ID is required for JWT generation.")
+                raise ValueError("❌ User ID is required.")
+
             if not invoice_no:
                 raise ValueError("❌ Invoice number is required.")
-            if role and role not in ["user", "admin"]:
-                raise ValueError(f"❌ Invalid role: {role}. Allowed values are 'user' or 'admin'.")
 
-            # Set default role if not provided
+            if role and role not in ["user", "admin"]:
+                raise ValueError("❌ Invalid role.")
             role = role or "user"
 
-            # Format amount to two decimal places
             formatted_amount = f"{float(amount):.2f}"
 
-            # Build payload for JWT
-            payload = {
+            # ✅ Prepare payload for 2C2P
+            payload_2c2p = {
                 "merchantID": merchant_id,
                 "invoiceNo": invoice_no,
                 "amount": formatted_amount,
@@ -173,48 +163,69 @@ class PaymentService:
                 "description": description,
                 "countryCode": country_code,
                 "user_id": user_id,
-                "role": role,  # Include role in payload
+                "role": role,
             }
 
-            logger.debug(f"🔑 JWT Payload: {payload}")
+            logger.debug(f"🔑 JWT Payload to 2C2P: {payload_2c2p}")
+            jwt_token = generate_jwt(payload_2c2p, secret_key_2c2p)
 
-            # Generate JWT token
-            jwt_token = generate_jwt(payload, secret_key)
-            logger.debug(f"✅ Generated JWT token: {jwt_token}")
-
-            # Prepare API request
             headers = {"Content-Type": "application/json"}
-            api_payload = {"payload": jwt_token}
+            response = requests.post(api_url, json={"payload": jwt_token}, headers=headers)
 
-            logger.info("📡 Sending request to 2C2P API...")
-            response = requests.post(api_url, json=api_payload, headers=headers)
-
-            # Log response status and body
-            logger.debug(f"Response Status: {response.status_code}")
-            logger.debug(f"Response Body: {response.text}")
-
-            # Raise an error for non-2xx HTTP statuses
+            logger.debug(f"📨 2C2P Response Status: {response.status_code}")
+            logger.debug(f"📨 2C2P Response Body: {response.text}")
             response.raise_for_status()
 
-            logger.info("✅ Payment token generated successfully.")
-            return response.json()
+            # ✅ Step 1: Extract payload from 2C2P's JWT response
+            result = response.json()
+            jwt_encoded = result.get("payload")
+            if not jwt_encoded:
+                raise Exception("2C2P response missing 'payload' field.")
 
-        except requests.exceptions.RequestException as req_err:
-            logger.error(f"❌ Request error with 2C2P API: {req_err}")
-            raise Exception("Failed to communicate with 2C2P API.") from req_err
+            # ✅ Step 2: Decode JWT (don't verify signature)
+            try:
+                decoded = jwt.decode(jwt_encoded, options={"verify_signature": False})
+                logger.debug(f"🔓 Decoded 2C2P JWT: {decoded}")
+            except Exception as decode_err:
+                raise Exception("Failed to decode 2C2P JWT") from decode_err
 
-        except ValueError as val_err:
-            logger.error(f"❌ Validation error: {val_err}")
-            raise val_err
+            payment_token = decoded.get("paymentToken")
+            web_payment_url = decoded.get("webPaymentUrl")
+            resp_code = decoded.get("respCode", "9999")
 
-        except EnvironmentError as env_err:
-            logger.error(f"❌ Environment configuration error: {env_err}")
-            raise env_err
+            if not payment_token or not web_payment_url:
+                raise Exception("Invalid 2C2P payload: missing paymentToken or webPaymentUrl")
+
+            # ✅ Step 3: Generate final JWT for frontend
+            # ✅ Step 3: Generate final JWT for frontend
+            now = datetime.utcnow()
+            final_payload = {
+                "paymentToken": payment_token,
+                "webPaymentUrl": web_payment_url,
+                "respCode": resp_code,
+                "invoiceNo": invoice_no,
+                "amount": formatted_amount,
+                "user_id": user_id,
+                "role": role,
+                "iat": int(now.timestamp()),
+                "exp": int((now + timedelta(minutes=15)).timestamp()),
+            }
+
+            final_jwt = jwt.encode(final_payload, jwt_secret, algorithm="HS256")
+
+            # ✅ FIX: Convert bytes to string if needed
+            if isinstance(final_jwt, bytes):
+                final_jwt = final_jwt.decode("utf-8")
+
+            logger.debug(f"🎁 Final JWT to frontend: {final_jwt}")
+            return {"payload": final_jwt}
+
 
         except Exception as e:
-            logger.error(f"❌ Unexpected error: {e}")
-            raise Exception("An unexpected error occurred during payment processing.") from e
-        
+            logger.exception("❌ Error during create_payment_token:")
+            raise
+
+            
 
     @staticmethod
     def get_payment_order(order_id):

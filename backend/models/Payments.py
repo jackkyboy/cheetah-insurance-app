@@ -1,54 +1,42 @@
 # /Users/apichet/Downloads/cheetah-insurance-app/backend/models/Payments.py
-from backend.models import db
+from backend.db import db, Model, Column, Integer, String, Float, Text, Date, Time, DateTime, ForeignKey, relationship, func
 import logging
 import uuid
-from datetime import datetime
 import urllib.parse
 
-# Configure Logging
-logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
-class Payments(db.Model):
-    """
-    Represents a payment order in the system.
-    """
+class Payments(Model):
     __tablename__ = 'Payments'
 
-    # Columns
-    payment_id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment="Primary key for Payments table")
-    order_id = db.Column(db.String(100), unique=True, nullable=False, comment="Unique order ID generated for payment")
-    customer_id = db.Column(db.Integer, db.ForeignKey('Customers.customer_id'), nullable=False, comment="Foreign key to Customers table")
-    package_id = db.Column(db.Integer, nullable=True, comment="Foreign key to selected insurance package (nullable for custom payments)")
-    amount = db.Column(db.Float, nullable=False, comment="Total payment amount")  # Add this column
-    premium = db.Column(db.Float, nullable=True, comment="Base insurance premium amount")
-    duty = db.Column(db.Float, nullable=True, comment="Stamp duty")
-    vat = db.Column(db.Float, nullable=True, comment="VAT (7%)")
-    total_price = db.Column(db.Float, nullable=True, comment="Final total price including VAT, duty, and add-ons")
-    add_ons = db.Column(db.Text, nullable=True, comment="Selected add-ons as comma-separated IDs")
-    coupon_code = db.Column(db.String(50), nullable=True, comment="Coupon code applied")
-    coverage_start_date = db.Column(db.Date, nullable=True, comment="Coverage start date")
-    coverage_start_time = db.Column(db.Time, nullable=True, comment="Coverage start time")
-    insurance_company = db.Column(db.String(255), nullable=True, comment="Selected insurance company name")
-    insurance_type = db.Column(db.String(50), nullable=True, comment="Insurance type (e.g., ชั้น 1, ชั้น 2+)")
-    car_brand = db.Column(db.String(100), nullable=True, comment="Car brand")
-    car_model = db.Column(db.String(100), nullable=True, comment="Car model")
-    car_submodel = db.Column(db.String(255), nullable=True, comment="Car submodel")
-    car_year = db.Column(db.Integer, nullable=True, comment="Car year")
-    payment_status = db.Column(db.String(50), default='pending', comment="Payment status: pending, success, failed")
-    payment_reference = db.Column(db.String(255), nullable=True, comment="Reference ID from payment gateway")
-    created_at = db.Column(db.DateTime, default=db.func.now(), comment="Timestamp when the payment was created")
-    updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now(), comment="Timestamp when the payment was last updated")
+    payment_id = Column(Integer, primary_key=True, autoincrement=True)
+    order_id = Column(String(100), unique=True, nullable=False)
+    customer_id = Column(Integer, ForeignKey('Customers.customer_id'), nullable=False)
+    package_id = Column(Integer, nullable=True)
+    amount = Column(Float, nullable=False)
+    premium = Column(Float, nullable=True)
+    duty = Column(Float, nullable=True)
+    vat = Column(Float, nullable=True)
+    total_price = Column(Float, nullable=True)
+    add_ons = Column(Text, nullable=True)
+    coupon_code = Column(String(50), nullable=True)
+    coverage_start_date = Column(Date, nullable=True)
+    coverage_start_time = Column(Time, nullable=True)
+    insurance_company = Column(String(255), nullable=True)
+    insurance_type = Column(String(50), nullable=True)
+    car_brand = Column(String(100), nullable=True)
+    car_model = Column(String(100), nullable=True)
+    car_submodel = Column(String(255), nullable=True)
+    car_year = Column(Integer, nullable=True)
+    payment_status = Column(String(50), default='pending')
+    payment_reference = Column(String(255), nullable=True)
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
-    # Relationships
-    customer = db.relationship('Customers', backref='payments', lazy=True)
+    customer = relationship('Customers', backref='payments', lazy=True)
 
     def to_dict(self):
-        """
-        Converts the Payments object into a dictionary for serialization.
-        """
-        logger.debug(f"Converting Payment ID {self.payment_id} to dictionary.")
         return {
             "payment_id": self.payment_id,
             "order_id": self.order_id,
@@ -75,30 +63,19 @@ class Payments(db.Model):
         }
 
 
-# Service Functions
+# === Service Functions ===
 
 def create_payment_order(customer_id, amount, currency='THB'):
-    """
-    Creates a new payment order.
-
-    Args:
-        customer_id (int): ID of the customer.
-        amount (float): Amount to be paid.
-        currency (str, optional): Currency of the payment. Defaults to 'THB'.
-
-    Returns:
-        dict: A dictionary representation of the created payment.
-    """
     try:
-        order_id = str(uuid.uuid4())  # Generate a unique order ID
+        order_id = str(uuid.uuid4())
         logger.debug(f"Creating payment order for customer_id={customer_id}, amount={amount}, currency={currency}")
         payment = Payments(
             order_id=order_id,
             customer_id=customer_id,
             amount=amount,
-            currency=currency,
             payment_status='pending'
         )
+        payment.currency = currency  # Inject currency temporarily
         db.session.add(payment)
         db.session.commit()
         logger.info(f"Payment order created successfully: {order_id}")
@@ -110,22 +87,10 @@ def create_payment_order(customer_id, amount, currency='THB'):
 
 
 def update_payment_status(order_id, status, payment_reference=None):
-    """
-    Updates the status of a payment order.
-
-    Args:
-        order_id (str): The unique order ID of the payment.
-        status (str): The new status of the payment.
-        payment_reference (str, optional): The payment gateway reference ID.
-
-    Returns:
-        dict: The updated payment details.
-    """
     try:
         logger.debug(f"Updating payment status for order_id={order_id} to status={status}")
         payment = Payments.query.filter_by(order_id=order_id).first()
         if not payment:
-            logger.warning(f"Payment order not found: {order_id}")
             raise ValueError("Order not found")
 
         payment.payment_status = status
@@ -142,20 +107,10 @@ def update_payment_status(order_id, status, payment_reference=None):
 
 
 def get_payment_order(order_id):
-    """
-    Retrieves payment details by order ID.
-
-    Args:
-        order_id (str): The unique order ID of the payment.
-
-    Returns:
-        dict: The payment details.
-    """
     try:
         logger.debug(f"Fetching payment order with order_id={order_id}")
         payment = Payments.query.filter_by(order_id=order_id).first()
         if not payment:
-            logger.warning(f"Payment order not found: {order_id}")
             raise ValueError("Order not found")
         return payment.to_dict()
     except Exception as e:
@@ -164,28 +119,17 @@ def get_payment_order(order_id):
 
 
 def generate_2c2p_payment_url(payment):
-    """
-    Generates a redirect URL for 2C2P payment gateway.
-
-    Args:
-        payment (Payments): The payment object.
-
-    Returns:
-        str: The redirect URL to the payment gateway.
-    """
     try:
         base_url = "https://payment.2c2p.com/payment"
         params = {
             'order_id': payment.order_id,
             'amount': f"{payment.amount:.2f}",
-            'currency': payment.currency,
-            'redirect_url': "https://your-website.com/payment/callback",  # Replace with actual redirect URL
-            'merchant_id': "YOUR_MERCHANT_ID"  # Replace with your 2C2P merchant ID
+            'currency': getattr(payment, 'currency', 'THB'),  # fallback currency
+            'redirect_url': "https://your-website.com/payment/callback",
+            'merchant_id': "YOUR_MERCHANT_ID"
         }
         query_string = urllib.parse.urlencode(params)
-        payment_url = f"{base_url}?{query_string}"
-        logger.info(f"Generated 2C2P payment URL: {payment_url}")
-        return payment_url
+        return f"{base_url}?{query_string}"
     except Exception as e:
         logger.exception("Error generating 2C2P payment URL.")
         raise Exception(f"Error generating payment URL: {str(e)}")

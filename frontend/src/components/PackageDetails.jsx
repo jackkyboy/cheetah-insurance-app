@@ -9,6 +9,7 @@ import CoverageDateTime from "./CoverageDateTime";
 import { jwtDecode } from "jwt-decode"; // Correct
 import "../assets/styles/animatedGradientText.css";
 
+
 // Mapping สำหรับชื่อเต็มบริษัทในภาษาไทยและภาษาอังกฤษ
 // ฟังก์ชันสำหรับดึงชื่อเต็มบริษัท
 const getFullCompanyName = (shortName, lang = "th") => {
@@ -311,6 +312,9 @@ const calculateTotalPrice = (data) => {
       throw error;
     }
   };
+
+
+  
   const handlePurchase = async () => {
     console.log("🚀 [handlePurchase] Function started");
     setLoadingPurchase(true);
@@ -364,87 +368,174 @@ const calculateTotalPrice = (data) => {
   // ฟังก์ชันสำหรับสร้าง Payload
   const createPayload = (customerData) => {
     try {
-      if (!customerData?.customer_id) {
-        throw new Error("Customer ID is missing.");
+      if (!customerData?.customer_id) throw new Error("Customer ID is missing.");
+      if (!id || typeof id !== "string") throw new Error("Package ID is missing or invalid.");
+      if (!totalPrice || totalPrice <= 0) throw new Error("Invalid total price.");
+  
+      const premium = calculation?.premium ?? packageData?.premium;
+      const duty = calculation?.duty;
+      const vat = calculation?.vat;
+      if ([premium, duty, vat].some((v) => v == null)) {
+        throw new Error("Premium / Duty / VAT are missing.");
       }
   
-      if (!id) {
-        throw new Error("Package ID is missing.");
-      }
-  
-      if (!totalPrice || totalPrice <= 0) {
-        throw new Error("Invalid total price.");
-      }
+      const { date, time } = coverageDateTime || {};
+      if (!date || !time) throw new Error("Coverage date/time is missing.");
   
       const payload = {
         customer_id: customerData.customer_id,
         package_id: id,
         amount: totalPrice,
         currency: "THB",
-        add_ons: selectedAddOns,
-        coupon_code: appliedCoupon?.code || null,
-        insurance_type: packageData?.insurance_type || null,
-        insurance_company: packageData?.insurance_company || null, // ✅ สำคัญ!
-        premium: calculation?.premium || packageData?.premium || null, // ✅ เพิ่ม
-        duty: calculation?.duty || null,                              // ✅ เพิ่ม
-        vat: calculation?.vat || null,                                // ✅ เพิ่ม
-        car_brand: packageData?.car_brand || null,
-        car_model: packageData?.car_model || null,
-        car_submodel: packageData?.car_submodel || null,
-        car_year: packageData?.car_year || null,
-        coverage_start_date: coverageDateTime?.date || null,          // ✅ แนะนำเพิ่ม
-        coverage_start_time: coverageDateTime?.time || null,
+        add_ons: selectedAddOns ?? [],
+        coupon_code: appliedCoupon?.code ?? null,
+        insurance_type: packageData?.insurance_type ?? null,
+        insurance_company: packageData?.insurance_company ?? null,
+        premium,
+        duty,
+        vat,
+        car_brand: packageData?.car_brand ?? null,
+        car_model: packageData?.car_model ?? null,
+        car_submodel: packageData?.car_submodel ?? null,
+        car_year: packageData?.car_year ?? null,
+        coverage_start_date: date,
+        coverage_start_time: time,
         description: "Insurance payment",
       };
   
       console.log("✅ [createPayload] Payload created:", payload);
       return payload;
     } catch (error) {
-      console.error("❌ [createPayload] Error:", error.message);
-      alert(`เกิดข้อผิดพลาดในการสร้างคำขอ: ${error.message}`);
+      console.error("❌ [createPayload]", error.message);
+      alert(`เกิดข้อผิดพลาด: ${error.message}`);
       throw error;
     }
   };
   
 
-
-
   const handleApiResponse = async (response) => {
     try {
       if (!response) throw new Error("ไม่มีการตอบกลับจาก API");
   
-      if (response.ok) {
-        const responseData = await response.json();
-        console.log("✅ [handleApiResponse] API Response Data:", responseData);
+      console.log("📦 [handleApiResponse] Response object:", response);
+      console.log("📦 [handleApiResponse] Status:", response.status);
   
-        const tokenPayload = responseData?.payload;
-        if (!tokenPayload) {
-          console.error("❌ payment_token.payload หายไป:", responseData);
-          alert("ข้อมูลการชำระเงินไม่สมบูรณ์");
-          return;
-        }
-  
-        const decoded = jwtDecode(tokenPayload);
-        console.log("🔓 Decoded Payload:", decoded);
-  
-        const webPaymentUrl = decoded?.webPaymentUrl;
-        if (webPaymentUrl && typeof webPaymentUrl === "string") {
-          console.log("✅ Redirecting to payment page:", webPaymentUrl);
-          window.location.href = webPaymentUrl;
-        } else {
-          console.error("❌ ไม่มี URL สำหรับชำระเงิน:", decoded);
-          alert("URL สำหรับการชำระเงินไม่ถูกต้อง");
-        }
-      } else {
-        const errorResponse = await response.json().catch(() => ({}));
-        console.error("❌ [API Error] Response:", errorResponse);
-        alert(errorResponse.error || "ไม่สามารถสร้างคำสั่งซื้อได้");
+      let data;
+      try {
+        data = await response.json();
+      } catch (jsonErr) {
+        console.error("❌ [JSON Parsing Error]", jsonErr);
+        throw new Error("ไม่สามารถแปลงข้อมูลเป็น JSON ได้");
       }
-    } catch (error) {
-      console.error("❌ [handleApiResponse] Unexpected error:", error.message);
-      alert(`เกิดข้อผิดพลาด: ${error.message}`);
+  
+      console.log("✅ [Parsed JSON from response]:", data);
+  
+      if (!response.ok) {
+        console.error("❌ [API Error]", data);
+        alert(data?.error || "ไม่สามารถสร้างคำสั่งซื้อได้");
+        return;
+      }
+  
+      // ✅ ปรับให้รองรับ payload ซ้อน
+      const token =
+        typeof data?.payload === "string"
+          ? data.payload
+          : typeof data?.payload?.payload === "string"
+          ? data.payload.payload
+          : data?.payload;
+  
+      console.log("🧪 typeof token:", typeof token, "value:", token);
+      window.__debug_token = token;
+  
+      if (!token) throw new Error("ไม่พบ payload จากเซิร์ฟเวอร์");
+  
+      // ✅ ถ้า payload เป็น object
+      if (typeof token === "object") {
+        console.log("🧩 [Token is object]:", token);
+        console.log("📦 FULL OBJECT payload:", JSON.stringify(token, null, 2));
+  
+        const webUrl = [
+          token?.redirect,
+          token?.payment_url,
+          token?.url,
+          token?.webPaymentUrl,
+          token?.web_payment_url,
+          token?.webpaymenturl,
+          token?.data?.redirect,
+          token?.data?.webPaymentUrl,
+          token?.data?.web_payment_url,
+          token?.result?.redirect,
+          token?.result?.webPaymentUrl
+        ].find(url => typeof url === "string" && url.startsWith("http"));
+  
+        console.log("🌐 [Extracted URL from object]:", webUrl);
+  
+        if (webUrl) {
+          console.log("🚀 Redirecting to (object):", webUrl);
+          return (window.location.href = webUrl);
+        } else {
+          throw new Error("webPaymentUrl ไม่ถูกต้องหรือไม่พบใน token object");
+        }
+      }
+  
+      // ✅ ถ้า payload เป็น JWT string
+      if (typeof token === "string" && token.length > 20) {
+        console.log("🔐 [Token is JWT string]:", token);
+  
+        let decoded;
+        try {
+          decoded = jwtDecode(token);
+          console.log("🔓 [Decoded JWT]:", decoded);
+          console.log("📦 FULL DECODED JWT:", JSON.stringify(decoded, null, 2));
+          window.__debug_decoded = decoded;
+        } catch (err) {
+          console.error("❌ [JWT Decode Error]:", err);
+          throw new Error("ไม่สามารถถอดรหัส token ได้");
+        }
+  
+        const webPaymentUrl = [
+          decoded?.redirect,
+          decoded?.payment_url,
+          decoded?.url,
+          decoded?.webPaymentUrl,
+          decoded?.web_payment_url,
+          decoded?.webpaymenturl,
+          decoded?.data?.webPaymentUrl,
+          decoded?.data?.web_payment_url,
+          decoded?.data?.redirect
+        ].find(url => typeof url === "string" && url.startsWith("http"));
+  
+        console.log("🌐 [Extracted URL from decoded JWT]:", webPaymentUrl);
+  
+        if (webPaymentUrl) {
+          console.log("🚀 Redirecting to (JWT):", webPaymentUrl);
+          return (window.location.href = webPaymentUrl);
+        } else {
+          throw new Error("webPaymentUrl ไม่ถูกต้องหรือไม่พบใน decoded JWT");
+        }
+      }
+  
+      throw new Error("Token ไม่ถูกต้องหรือไม่สามารถถอดรหัสได้");
+  
+    } catch (err) {
+      console.error("❌ [handleApiResponse Catch Block]", err.message);
+      alert(`เกิดข้อผิดพลาด: ${err.message}`);
     }
   };
+  
+  
+  
+  
+  
+  
+  
+
+  
+  
+  
+  
+  
+  
   
   
 
@@ -714,21 +805,21 @@ return (
 
 
 
+
       {/* ปุ่มดำเนินการ */}
       <div className="actions">
-      <button
-        className="btn btn-success"
-        onClick={() => {
-          console.log("🟢 [Button Clicked] handlePurchase started.");
-          handlePurchase();
-        }}
-        disabled={loadingPurchase || !coverageDateTime.date}
-      >
-        {loadingPurchase ? "กำลังดำเนินการ..." : "ซื้อเลย"}
-      </button>
+        <button
+          className="btn btn-success"
+          onClick={handlePurchase}
+          disabled={loadingPurchase || !coverageDateTime?.date}
+        >
+          {loadingPurchase ? "กำลังดำเนินการ..." : "ซื้อเลย"}
+        </button>
 
-
-        <button className="btn btn-secondary" onClick={() => navigate(-1)}>
+        <button
+          className="btn btn-secondary"
+          onClick={() => navigate(-1)}
+        >
           ย้อนกลับ
         </button>
       </div>
@@ -736,9 +827,11 @@ return (
       {/* แสดงข้อความ error ถ้ามี */}
       {error && (
         <div className="error-message">
-          <strong>เกิดข้อผิดพลาด:</strong> {error}
+          <strong>เกิดข้อผิดพลาด:</strong> {error || "ไม่สามารถดำเนินการได้"}
         </div>
       )}
+
+
 
 
     </div>

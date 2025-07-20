@@ -1,35 +1,33 @@
 # /Users/apichet/Downloads/cheetah-insurance-app/backend/models/CustomerPolicies.py
 import logging
 from datetime import datetime, timedelta
-from backend.models import db
+from backend.db import (
+    db, Model, Column, Integer, String, DateTime, Text, ForeignKey, relationship
+)
 
-# ตั้งค่า Logging
+# Logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-class CustomerPolicies(db.Model):
+
+class CustomerPolicies(Model):
     __tablename__ = 'Customer_Policies'
 
-    policy_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    customer_id = db.Column(db.Integer, db.ForeignKey('Customers.customer_id'), nullable=False)
-    package_id = db.Column(db.Integer, db.ForeignKey('Car_Insurance_Packages.package_id'), nullable=False)
-    request_date = db.Column(db.DateTime, default=db.func.now)
-    start_date = db.Column(db.DateTime, nullable=False)
-    end_date = db.Column(db.DateTime, nullable=False)
-    status = db.Column(db.String(50), default='active')
-    policy_number = db.Column(db.String(100), nullable=True)
-    insurance_company_response = db.Column(db.Text, nullable=True)
+    policy_id = Column(Integer, primary_key=True, autoincrement=True)
+    customer_id = Column(Integer, ForeignKey('Customers.customer_id'), nullable=False)
+    package_id = Column(Integer, ForeignKey('Car_Insurance_Packages.package_id'), nullable=False)
+    request_date = Column(DateTime, default=db.func.now)
+    start_date = Column(DateTime, nullable=False)
+    end_date = Column(DateTime, nullable=False)
+    status = Column(String(50), default='active')
+    policy_number = Column(String(100), nullable=True)
+    insurance_company_response = Column(Text, nullable=True)
 
-    # ความสัมพันธ์กับ Customers
-    customer = db.relationship('Customers', back_populates='policies', lazy='joined')
-
-    # ความสัมพันธ์กับ CarInsurancePackages
-    insurance_package = db.relationship('CarInsurancePackages', back_populates='policies', lazy='joined')
+    # Relationships
+    customer = relationship('Customers', back_populates='policies', lazy='joined')
+    insurance_package = relationship('CarInsurancePackages', back_populates='policies', lazy='joined')
 
     def to_dict(self):
-        """
-        แปลงข้อมูลกรมธรรม์ให้อยู่ในรูปแบบ dictionary
-        """
         try:
             logger.debug(f"Converting policy_id={self.policy_id} to dictionary.")
             return {
@@ -48,7 +46,8 @@ class CustomerPolicies(db.Model):
             raise ValueError("Failed to serialize CustomerPolicies data")
 
 
-# Service Functions
+# -------- Service Functions --------
+
 def get_expiring_policies(days_before=30):
     """
     ค้นหากรมธรรม์ที่กำลังจะหมดอายุในช่วงเวลาที่กำหนด
@@ -56,7 +55,7 @@ def get_expiring_policies(days_before=30):
     try:
         notification_date = datetime.utcnow() + timedelta(days=days_before)
         logger.debug(f"Fetching policies expiring before: {notification_date}")
-        
+
         expiring_policies = CustomerPolicies.query.filter(
             CustomerPolicies.end_date <= notification_date,
             CustomerPolicies.status == 'active'
@@ -64,7 +63,7 @@ def get_expiring_policies(days_before=30):
 
         results = []
         for policy in expiring_policies:
-            if policy.customer and policy.customer.user:
+            if policy.customer and getattr(policy.customer, "user", None):
                 results.append({
                     'policy_id': policy.policy_id,
                     'customer_id': policy.customer_id,
@@ -94,9 +93,9 @@ def send_expiry_notifications():
 
         for policy in expiring_policies:
             logger.debug(f"Sending notification for policy_id={policy['policy_id']} to {policy['email']}")
-            # Add actual email sending logic here (e.g., SMTP or a service like SendGrid)
+            # TODO: Add actual email sending logic here
             print(f"Sending notification to {policy['email']} for policy {policy['policy_id']} "
-                f"expiring on {policy['end_date']}")
+                  f"expiring on {policy['end_date']}")
 
         logger.info(f"{len(expiring_policies)} notifications sent.")
         return {"message": f"{len(expiring_policies)} notifications sent."}

@@ -4,56 +4,55 @@ import os
 import base64
 from dotenv import load_dotenv
 
-# === 🧠 เลือกโหลด .env ตาม ENVIRONMENT ===
-ENVIRONMENT = os.environ.get("ENVIRONMENT", "development").lower()
-dotenv_file = {
+# === 🌐 ENVIRONMENT LOADING ===
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development").lower()
+DOTENV_PATH = {
     "production": ".env.production",
     "development": ".env",
     "sandbox": ".env"
 }.get(ENVIRONMENT, ".env")
 
-if os.path.exists(dotenv_file):
-    load_dotenv(dotenv_file)
+if os.path.exists(DOTENV_PATH):
+    load_dotenv(DOTENV_PATH)
 
-# === 🔐 Decode base64 secret files ===
-def decode_base64_cert_files():
-    secret_map = {
+# === 🔐 BASE64 SECRET FILES DECODER ===
+def decode_base64_env_files():
+    output_paths = {
         "SANDBOX_PKCS7_BASE64": "/tmp/sandbox-pkcs7.cer",
         "PRIVATE_KEY_BASE64": "/tmp/merchant-private-key.der",
         "PUBLIC_CERT_BASE64": "/tmp/jwt-demo.cer",
-        "GOOGLE_CREDENTIALS_BASE64": "/tmp/credentials.json",
+        "GOOGLE_CREDENTIALS_BASE64": "/tmp/credentials.json"
     }
 
-    for env_var, out_path in secret_map.items():
-        val = os.getenv(env_var)
+    for var, filepath in output_paths.items():
+        val = os.getenv(var)
         if val:
             try:
-                with open(out_path, "wb") as f:
+                with open(filepath, "wb") as f:
                     f.write(base64.b64decode(val))
-                print(f"✅ Decoded {env_var} → {out_path}")
+                print(f"✅ Decoded {var} → {filepath}")
             except Exception as e:
-                print(f"❌ Failed to decode {env_var}: {e}")
+                print(f"❌ Failed to decode {var}: {e}")
         else:
-            print(f"⚠️ Missing environment variable: {env_var}")
+            print(f"⚠️ Missing env variable: {var}")
 
-    # Set GCP credentials path
+    # Set default GOOGLE_APPLICATION_CREDENTIALS if decoded
     if os.getenv("GOOGLE_CREDENTIALS_BASE64"):
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/tmp/credentials.json"
 
-# 🧪 เรียก decode ก่อนโหลด config
-decode_base64_cert_files()
+decode_base64_env_files()
 
+# === ⚙️ MAIN CONFIGURATION CLASS ===
 class Config:
-    # --- Environment & Secrets ---
+    # --- General ---
     ENVIRONMENT = os.getenv("ENVIRONMENT", "sandbox")
     SECRET_KEY = os.getenv("SECRET_KEY", os.getenv("FLASK_SECRET_KEY", "fallback_flask_secret_key"))
-    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "fallback_jwt_secret_key")
+    LOG_LEVEL = os.getenv("LOG_LEVEL", "DEBUG")
 
-    # --- Token Expiry ---
+    # --- JWT ---
+    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "fallback_jwt_secret_key")
     ACCESS_TOKEN_EXPIRY_HOURS = int(os.getenv("ACCESS_TOKEN_EXPIRY_HOURS", 24))
     REFRESH_TOKEN_EXPIRY_DAYS = int(os.getenv("REFRESH_TOKEN_EXPIRY_DAYS", 7))
-
-    # --- JWT Config ---
     JWT_TOKEN_LOCATION = ["headers", "cookies"]
     JWT_HEADER_NAME = "Authorization"
     JWT_HEADER_TYPE = "Bearer"
@@ -61,14 +60,14 @@ class Config:
     JWT_REFRESH_TOKEN_EXPIRES = REFRESH_TOKEN_EXPIRY_DAYS * 86400
     JWT_BLACKLIST_ENABLED = os.getenv("JWT_BLACKLIST_ENABLED", "True") == "True"
 
-    # --- Frontend / Return URLs ---
-    FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+    # --- Frontend URLs ---
+    FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3001")
     FRONTEND_RETURN_URL = os.getenv("FRONTEND_RETURN_URL", f"{FRONTEND_URL}/success")
     BACKEND_RETURN_URL = os.getenv("BACKEND_RETURN_URL", "http://127.0.0.1:5000/api/payment_callback")
 
     # --- CORS ---
     CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", ",".join([
-        "http://localhost:3000",
+        "http://localhost:3001",
         "https://cheetahinsurancebroker.com",
         "https://app.cheetahinsurancebroker.com",
         "https://63894e1bb428.ngrok-free.app"
@@ -78,10 +77,7 @@ class Config:
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
     PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, ".."))
     INSTANCE_DIR = os.path.join(PROJECT_ROOT, "instance")
-    SQLALCHEMY_DATABASE_URI = os.getenv(
-        "DATABASE_URI",
-        f"sqlite:///{os.path.join(INSTANCE_DIR, 'cheetah_insurance.db')}"
-    )
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URI", f"sqlite:///{os.path.join(INSTANCE_DIR, 'cheetah_insurance.db')}")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # --- Uploads ---
@@ -104,19 +100,17 @@ class Config:
     MAIL_PASSWORD = os.getenv("MAIL_PASSWORD", "")
     MAIL_DEFAULT_SENDER = os.getenv("MAIL_DEFAULT_SENDER", MAIL_USERNAME)
 
-    # --- Merchant Config ---
+    # --- Merchant Info ---
     MERCHANT_CONFIG_TH_ID = os.getenv("MERCHANT_CONFIG_TH_ID", "default_merchant_id")
     MERCHANT_CONFIG_TH_SECRET = os.getenv("MERCHANT_CONFIG_TH_SECRET", "default_merchant_secret")
     MERCHANT_CONFIG_TH_CURRENCY = os.getenv("MERCHANT_CONFIG_TH_CURRENCY", "THB")
 
-    # --- Certs ---
+    # --- Certificate Paths ---
     CERT_PATH = os.getenv("CERT_PATH", "/tmp/sandbox-pkcs7.cer")
     PUBLIC_KEY_PATH = os.getenv("PUBLIC_KEY_PATH", "/tmp/jwt-demo.cer")
     PRIVATE_KEY_PATH = os.getenv("PRIVATE_KEY_PATH", "/tmp/merchant-private-key.der")
 
-    # --- Logging ---
-    LOG_LEVEL = os.getenv("LOG_LEVEL", "DEBUG")
-
+    # --- Logger Preview ---
     @staticmethod
     def log_configuration():
         import logging
@@ -127,6 +121,6 @@ class Config:
             if attr.isupper():
                 logger.debug(f"{attr}: {getattr(Config, attr)}")
 
-# ✅ Debug mode: Log everything
+# 🧪 CLI DEBUG MODE
 if __name__ == "__main__":
     Config.log_configuration()

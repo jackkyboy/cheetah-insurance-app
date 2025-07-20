@@ -1,5 +1,5 @@
 # backend/models/InsurancePreparation.py
-from backend.models import db
+from backend.db import db, Model, Column, Integer, DateTime, JSON, ForeignKey, relationship
 from datetime import datetime
 import logging
 
@@ -8,31 +8,31 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
-class InsurancePreparation(db.Model):
+class InsurancePreparation(Model):
     __tablename__ = "insurance_preparations"
 
     # Columns
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("Users.user_id"), nullable=False)
-    insured_info = db.Column(db.JSON, nullable=True)
-    motor_info = db.Column(db.JSON, nullable=True)
-    policy_info = db.Column(db.JSON, nullable=True)
-    driver_info = db.Column(db.JSON, nullable=True)
-    beneficiary_info = db.Column(db.JSON, nullable=True)
-    coverage_info = db.Column(db.JSON, nullable=True)
-    consent_info = db.Column(db.JSON, nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("Users.user_id"), nullable=False)
+    insured_info = Column(JSON, nullable=True)
+    motor_info = Column(JSON, nullable=True)
+    policy_info = Column(JSON, nullable=True)
+    driver_info = Column(JSON, nullable=True)
+    beneficiary_info = Column(JSON, nullable=True)
+    coverage_info = Column(JSON, nullable=True)
+    consent_info = Column(JSON, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationships
-    user = db.relationship(
+    user = relationship(
         "Users",
         back_populates="insurance_preparations",
-        lazy="joined"  # Fetch user data when querying InsurancePreparation
+        lazy="joined"
     )
 
     def __init__(self, user_id, insured_info=None, motor_info=None, policy_info=None,
-                driver_info=None, beneficiary_info=None, coverage_info=None, consent_info=None):
+                 driver_info=None, beneficiary_info=None, coverage_info=None, consent_info=None):
         self.user_id = user_id
         self.insured_info = insured_info or {}
         self.motor_info = motor_info or {}
@@ -43,10 +43,6 @@ class InsurancePreparation(db.Model):
         self.consent_info = consent_info or {}
 
     def to_dict(self):
-        """
-        Converts the InsurancePreparation object to a dictionary format.
-        Includes the user's email from the Users table.
-        """
         logger.debug(f"Converting InsurancePreparation ID {self.id} to dictionary.")
         return {
             "id": self.id,
@@ -60,21 +56,11 @@ class InsurancePreparation(db.Model):
             "consent_info": self.consent_info,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
-            "user_email": self.user.email if self.user else None,  # ดึง Email ของผู้ใช้จากความสัมพันธ์
+            "user_email": self.user.email if self.user else None,
         }
-
 
     @staticmethod
     def get_preparations_by_user(user_id):
-        """
-        Retrieves all insurance preparations for a given user.
-
-        Args:
-            user_id (int): ID of the user.
-
-        Returns:
-            list: A list of preparations in dictionary format.
-        """
         logger.debug(f"Fetching insurance preparations for user_id={user_id}")
         try:
             preparations = InsurancePreparation.query.filter_by(user_id=user_id).all()
@@ -86,15 +72,6 @@ class InsurancePreparation(db.Model):
 
     @staticmethod
     def delete_preparation(preparation_id):
-        """
-        Deletes an insurance preparation record by its ID.
-
-        Args:
-            preparation_id (int): ID of the preparation to delete.
-
-        Returns:
-            dict: Confirmation message upon successful deletion.
-        """
         logger.debug(f"Deleting insurance preparation with ID {preparation_id}")
         try:
             preparation = InsurancePreparation.query.get(preparation_id)
@@ -110,4 +87,3 @@ class InsurancePreparation(db.Model):
             db.session.rollback()
             logger.exception(f"Error deleting preparation ID {preparation_id}")
             raise Exception(f"Error deleting preparation: {str(e)}")
-

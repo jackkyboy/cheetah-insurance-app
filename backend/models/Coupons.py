@@ -1,23 +1,21 @@
-from backend.models import db  # นำเข้า `db` จาก `__init__.py`
 from datetime import datetime
+from backend.db import (
+    db, Model, Column, Integer, String, Float, Boolean, DateTime, ForeignKey, relationship
+)
 
-# โมเดล Coupons
-class Coupons(db.Model):
+
+class Coupons(Model):
     __tablename__ = 'Coupons'
 
-    coupon_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    code = db.Column(db.String(50), unique=True, nullable=False)  # รหัสคูปอง ต้องไม่ซ้ำ
-    discount_percentage = db.Column(db.Float, nullable=False)  # ส่วนลด (%)
-    expiration_date = db.Column(db.DateTime, nullable=False)  # วันหมดอายุ
-    is_active = db.Column(db.Boolean, default=True)  # สถานะ Active
+    coupon_id = Column(Integer, primary_key=True, autoincrement=True)
+    code = Column(String(50), unique=True, nullable=False)
+    discount_percentage = Column(Float, nullable=False)
+    expiration_date = Column(DateTime, nullable=False)
+    is_active = Column(Boolean, default=True)
 
-    # ความสัมพันธ์กับ CustomerCoupons
-    assigned_to = db.relationship('CustomerCoupons', back_populates='coupon', lazy=True)
+    assigned_to = relationship('CustomerCoupons', back_populates='coupon', lazy=True)
 
     def to_dict(self):
-        """
-        แปลงข้อมูลคูปองเป็น dictionary
-        """
         return {
             "coupon_id": self.coupon_id,
             "code": self.code,
@@ -27,23 +25,18 @@ class Coupons(db.Model):
         }
 
 
-# โมเดล CustomerCoupons
-class CustomerCoupons(db.Model):
+class CustomerCoupons(Model):
     __tablename__ = 'Customer_Coupons'
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    customer_id = db.Column(db.Integer, db.ForeignKey('Customers.customer_id'), nullable=False)  # FK ไปยัง Customers
-    coupon_id = db.Column(db.Integer, db.ForeignKey('Coupons.coupon_id'), nullable=False)  # FK ไปยัง Coupons
-    assigned_date = db.Column(db.DateTime, default=db.func.now())  # วันที่แจกคูปอง
-    redeemed = db.Column(db.Boolean, default=False)  # ใช้แล้วหรือยัง
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    customer_id = Column(Integer, ForeignKey('Customers.customer_id'), nullable=False)
+    coupon_id = Column(Integer, ForeignKey('Coupons.coupon_id'), nullable=False)
+    assigned_date = Column(DateTime, default=db.func.now())
+    redeemed = Column(Boolean, default=False)
 
-    # ความสัมพันธ์กับ Coupons
-    coupon = db.relationship('Coupons', back_populates='assigned_to')
+    coupon = relationship('Coupons', back_populates='assigned_to')
 
     def to_dict(self):
-        """
-        แปลงข้อมูล CustomerCoupon เป็น dictionary
-        """
         return {
             "id": self.id,
             "customer_id": self.customer_id,
@@ -53,13 +46,11 @@ class CustomerCoupons(db.Model):
         }
 
 
-# ฟังก์ชันสำหรับสร้างคูปอง
+# ----------- Service Functions -----------
+
 def create_coupon(code, discount_percentage, expiration_date):
-    """
-    สร้างคูปองใหม่
-    """
     if Coupons.query.filter_by(code=code).first():
-        raise ValueError("Coupon code already exists.")  # ตรวจสอบว่ารหัสคูปองซ้ำหรือไม่
+        raise ValueError("Coupon code already exists.")
 
     try:
         coupon = Coupons(
@@ -68,23 +59,19 @@ def create_coupon(code, discount_percentage, expiration_date):
             expiration_date=expiration_date
         )
         db.session.add(coupon)
-        db.session.commit()  # บันทึกข้อมูลลงฐานข้อมูล
+        db.session.commit()
         return coupon.to_dict()
     except Exception as e:
         db.session.rollback()
         raise Exception(f"Failed to create coupon: {str(e)}")
 
 
-# ฟังก์ชันสำหรับแจกคูปองให้ลูกค้า
 def assign_coupon_to_customer(customer_id, coupon_id):
-    """
-    แจกคูปองให้ลูกค้าตาม customer_id และ coupon_id
-    """
     coupon = Coupons.query.get(coupon_id)
     if not coupon:
         raise ValueError("Coupon not found.")
     if not coupon.is_active or coupon.expiration_date < datetime.utcnow():
-        raise ValueError("Coupon is inactive or has expired.")  # ตรวจสอบว่าคูปองหมดอายุหรือถูกปิดใช้งาน
+        raise ValueError("Coupon is inactive or has expired.")
 
     assignment = CustomerCoupons(
         customer_id=customer_id,
@@ -92,19 +79,15 @@ def assign_coupon_to_customer(customer_id, coupon_id):
     )
     try:
         db.session.add(assignment)
-        db.session.commit()  # บันทึกการแจกคูปอง
+        db.session.commit()
         return assignment.to_dict()
     except Exception as e:
         db.session.rollback()
         raise Exception(f"Failed to assign coupon: {str(e)}")
 
 
-# ฟังก์ชันสำหรับดึงข้อมูลคูปองของลูกค้า
 def get_customer_coupons(customer_id):
-    """
-    ดึงคูปองที่ยังไม่ถูกใช้ของลูกค้า
-    """
-    from backend.models.Customers import Customers  # Import โมเดล Customers
+    from backend.models.Customers import Customers
     customer = Customers.query.get(customer_id)
     if not customer:
         raise ValueError("Customer not found.")
@@ -113,12 +96,12 @@ def get_customer_coupons(customer_id):
     return [coupon.to_dict() for coupon in coupons]
 
 
-# ฟังก์ชันสำหรับ Redeem คูปอง
 def redeem_coupon(customer_id, coupon_id):
-    """
-    Redeem คูปองที่ลูกค้าถืออยู่
-    """
-    customer_coupon = CustomerCoupons.query.filter_by(customer_id=customer_id, coupon_id=coupon_id, redeemed=False).first()
+    customer_coupon = CustomerCoupons.query.filter_by(
+        customer_id=customer_id,
+        coupon_id=coupon_id,
+        redeemed=False
+    ).first()
     if not customer_coupon:
         raise ValueError("Coupon not found or already redeemed.")
 

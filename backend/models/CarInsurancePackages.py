@@ -1,49 +1,49 @@
 # /Users/apichet/Downloads/cheetah-insurance-app/backend/models/CarInsurancePackages.py
 import logging
-from backend.models import db
+from backend.db import (
+    db, Model, Column, Integer, String, Float, ForeignKey, Index, relationship
+)
 
 # ตั้งค่า Logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-class CarInsurancePackages(db.Model):
+
+class CarInsurancePackages(Model):
     __tablename__ = 'Car_Insurance_Packages'
 
-    package_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    company_id = db.Column(db.Integer, db.ForeignKey('Insurance_Companies.company_id'), nullable=False)
-    car_brand = db.Column(db.String(100), nullable=False)  # เพิ่มยี่ห้อรถยนต์
-    car_model = db.Column(db.String(100), nullable=False)  # เพิ่มรุ่นรถยนต์
-    car_model_year = db.Column(db.String(4), nullable=False)  # เพิ่มปีของรุ่นรถยนต์
-    car_submodel = db.Column(db.String(255), nullable=False)
-    premium = db.Column(db.Float, nullable=False)
-    cmi_amount = db.Column(db.Float, nullable=True)
-    liability_per_person = db.Column(db.Float, nullable=True)
-    liability_per_event = db.Column(db.Float, nullable=True)
-    liability_property = db.Column(db.Float, nullable=True)
-    liability_deductible = db.Column(db.Float, nullable=True)
-    own_damage = db.Column(db.Float, nullable=True)
-    own_theft_fire_damage = db.Column(db.Float, nullable=True)
-    coverage_driver_death = db.Column(db.Float, nullable=True)
-    coverage_passenger_death = db.Column(db.Float, nullable=True)
-    coverage_medical_expense = db.Column(db.Float, nullable=True)
-    coverage_bail_bond = db.Column(db.Float, nullable=True)
-    repair_type = db.Column(db.String(50), nullable=True)
+    package_id = Column(Integer, primary_key=True, autoincrement=True)
+    company_id = Column(Integer, ForeignKey('Insurance_Companies.company_id'), nullable=False)
 
-    # ความสัมพันธ์กับ CustomerPolicies
-    policies = db.relationship('CustomerPolicies', back_populates='insurance_package', lazy=True)
+    car_brand = Column(String(100), nullable=False)
+    car_model = Column(String(100), nullable=False)
+    car_model_year = Column(String(4), nullable=False)
+    car_submodel = Column(String(255), nullable=False)
 
-    # ดัชนีสำหรับเพิ่มประสิทธิภาพการค้นหา
+    premium = Column(Float, nullable=False)
+    cmi_amount = Column(Float, nullable=True)
+    liability_per_person = Column(Float, nullable=True)
+    liability_per_event = Column(Float, nullable=True)
+    liability_property = Column(Float, nullable=True)
+    liability_deductible = Column(Float, nullable=True)
+    own_damage = Column(Float, nullable=True)
+    own_theft_fire_damage = Column(Float, nullable=True)
+    coverage_driver_death = Column(Float, nullable=True)
+    coverage_passenger_death = Column(Float, nullable=True)
+    coverage_medical_expense = Column(Float, nullable=True)
+    coverage_bail_bond = Column(Float, nullable=True)
+    repair_type = Column(String(50), nullable=True)
+
+    policies = relationship('CustomerPolicies', back_populates='insurance_package', lazy=True)
+
     __table_args__ = (
-        db.Index('idx_car_brand', 'car_brand'),
-        db.Index('idx_car_model', 'car_model'),
-        db.Index('idx_car_model_year', 'car_model_year'),
-        db.Index('idx_search', 'car_brand', 'car_model', 'car_model_year', 'car_submodel'),
+        Index('idx_car_brand', 'car_brand'),
+        Index('idx_car_model', 'car_model'),
+        Index('idx_car_model_year', 'car_model_year'),
+        Index('idx_search', 'car_brand', 'car_model', 'car_model_year', 'car_submodel'),
     )
 
     def to_dict(self):
-        """
-        แปลงข้อมูล CarInsurancePackage ให้อยู่ในรูปแบบ dictionary
-        """
         try:
             logger.debug(f"Converting package_id={self.package_id} to dictionary.")
             return {
@@ -70,6 +70,7 @@ class CarInsurancePackages(db.Model):
         except Exception as e:
             logger.error(f"Error converting CarInsurancePackages to dictionary: {e}")
             raise ValueError("Failed to serialize CarInsurancePackages data")
+
 
 # Service Functions
 def search_packages(car_brand, car_model, car_model_year, car_submodel=None):

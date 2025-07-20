@@ -1,146 +1,113 @@
 /*/Users/apichet/Downloads/cheetah-insurance-app/src/api/paymentService.js */
-import axios from "./axios"; // Adjust the path if your axios instance is configured elsewhere
+import axios from "./axios";
+import jwtDecode from "jwt-decode";
 
-/**
- * Validate payload structure
- * @param {Object} payload - The payload containing payment details
- * @param {Array} requiredFields - List of required fields
- * @throws {Error} If validation fails
- */
+// 🔍 ตรวจสอบว่ามีฟิลด์จำเป็นครบ
 const validatePayload = (payload, requiredFields) => {
-  const missingFields = requiredFields.filter(
+  const missing = requiredFields.filter(
     (field) => !payload[field] || payload[field] === ""
   );
-  if (missingFields.length > 0) {
-    throw new Error(`Missing required fields: ${missingFields.join(", ")}`);
+  if (missing.length > 0) {
+    throw new Error(`Missing required fields: ${missing.join(", ")}`);
   }
 };
 
-/**
- * Create a new payment order and redirect to the payment page.
- * @param {Object} payload - The payload containing payment details
- * @returns {Promise<Object>} - Payment order response
- */
+// 🔐 Decode JWT อย่างปลอดภัย
+const decodeJwtPayload = (token) => {
+  try {
+    const decoded = jwtDecode(token);
+    console.debug("🧠 Decoded JWT:", decoded);
+    return decoded;
+  } catch (err) {
+    console.error("❌ Failed to decode JWT:", err);
+    throw new Error("JWT format ไม่ถูกต้อง");
+  }
+};
+
+// 🚀 สร้างคำสั่งชำระเงินและ redirect ไปยัง 2C2P
+// 🚀 สร้างคำสั่งชำระเงินและ redirect ไปยัง 2C2P
 export const createPaymentOrder = async (payload) => {
   try {
-    // ✅ Validate payload before sending the request
     validatePayload(payload, ["customer_id", "amount", "currency"]);
 
-    const response = await axios.post("/payments/create", payload);
-    console.log("✅ [PaymentService] Payment Order Created:", response.data);
+    const res = await axios.post("/payments/create", payload);
+    const raw = res?.data;
+    console.debug("📦 Raw backend response:", raw);
 
-    // ✅ Extract JWT payload from backend response
-    const jwtPayload = response.data?.payload;
-    if (!jwtPayload) {
-      console.error("❌ Missing JWT payload in response.");
-      throw new Error("Missing JWT payload in response.");
+    const jwtString = raw?.payload;
+
+    if (typeof jwtString !== "string") {
+      console.error("⚠️ payload is not a string:", jwtString);
+      throw new Error("ข้อมูลการชำระเงินไม่สมบูรณ์");
     }
 
-    // ✅ Decode the middle part of the JWT to extract webPaymentUrl
-    const decoded = JSON.parse(atob(jwtPayload.split(".")[1]));
-    const webPaymentUrl = decoded.webPaymentUrl;
-
-    // ✅ Ensure the `webPaymentUrl` exists
-    if (!webPaymentUrl) {
-      console.error("❌ webPaymentUrl is missing in the decoded JWT.");
-      throw new Error("webPaymentUrl is missing in the decoded JWT.");
+    // ✅ เช็กว่าเป็น JWT แบบ 3 ส่วน
+    const parts = jwtString.split(".");
+    if (parts.length !== 3) {
+      console.error("⚠️ JWT format is invalid:", jwtString);
+      throw new Error("ข้อมูลการชำระเงินไม่สมบูรณ์");
     }
 
-    console.log("🔗 Redirecting user to:", webPaymentUrl);
+    const decoded = decodeJwtPayload(jwtString);
 
-    // ✅ Redirect the user to the external payment page
-    window.location.href = webPaymentUrl;
+    // ✅ ลองทุก field ที่เป็นไปได้
+    const redirectUrl = decoded?.webPaymentUrl || decoded?.web_payment_url || decoded?.paymentUrl || decoded?.url;
 
-    return response.data; // Return for debugging/logging purposes
+    if (!redirectUrl || typeof redirectUrl !== "string" || !redirectUrl.startsWith("http")) {
+      console.error("❌ URL สำหรับ redirect ไม่พบใน JWT:", decoded);
+      throw new Error("ไม่พบ URL สำหรับชำระเงินใน JWT ที่ส่งมา");
+    }
+
+    console.info("🔗 Redirecting user to:", redirectUrl);
+    window.location.href = redirectUrl;
+
+    return raw;
   } catch (error) {
-    console.error(
-      "❌ [PaymentService] Error creating payment order:",
-      error.response?.data || error.message
-    );
-    throw error.response?.data || new Error("Failed to create payment order");
+    const errMsg = error?.response?.data?.error || error.message || "ไม่สามารถสร้างคำสั่งชำระเงินได้";
+    console.error("❌ [createPaymentOrder]", errMsg);
+    throw new Error(errMsg);
   }
 };
 
 
-/**
- * Fetch available payment options for a given payment token
- * @param {String} paymentToken - The payment token from 2C2P
- * @returns {Promise<Object>} - Available payment options
- */
+
+// 📦 ดึงช่องทางชำระเงินที่รองรับ
 export const fetchPaymentOptions = async (paymentToken) => {
   try {
-    // Validate paymentToken
-    if (!paymentToken) {
-      throw new Error("Payment token is required.");
-    }
-
-    const response = await axios.post("/payments/options", {
-      payment_token: paymentToken, // Include the payment token in the request body
-    });
-    console.log("✅ [PaymentService] Payment Options Fetched:", response.data);
-    return response.data; // Return the payment options response
+    if (!paymentToken) throw new Error("Payment token is required.");
+    const res = await axios.post("/payments/options", { payment_token: paymentToken });
+    return res.data;
   } catch (error) {
-    console.error(
-      "❌ [PaymentService] Error fetching payment options:",
-      error.response?.data || error.message
-    );
-    // Throw the error response or a default error
-    throw error.response?.data || new Error("Failed to fetch payment options");
+    const errMsg = error?.response?.data?.error || error.message;
+    console.error("❌ [fetchPaymentOptions]", errMsg);
+    throw new Error(errMsg);
   }
 };
 
-/**
- * Get payment status by order ID
- * @param {String} orderId - The order ID of the payment
- * @returns {Promise<Object>} - Payment status response
- */
+// 📄 ตรวจสอบสถานะการชำระเงิน
 export const getPaymentStatus = async (orderId) => {
   try {
-    // Validate orderId
-    if (!orderId) {
-      throw new Error("Order ID is required.");
-    }
-
-    const response = await axios.get(`/payments/status/${orderId}`);
-    console.log("✅ [PaymentService] Payment Status Fetched:", response.data);
-    return response.data; // Return the payment status from the backend
+    if (!orderId) throw new Error("Order ID is required.");
+    const res = await axios.get(`/payments/status/${orderId}`);
+    return res.data;
   } catch (error) {
-    console.error(
-      "❌ [PaymentService] Error fetching payment status:",
-      error.response?.data || error.message
-    );
-    // Throw the error response or a default error
-    throw error.response?.data || new Error("Failed to fetch payment status");
+    const errMsg = error?.response?.data?.error || error.message;
+    console.error("❌ [getPaymentStatus]", errMsg);
+    throw new Error(errMsg);
   }
 };
 
-/**
- * Generate a payment URL for redirection
- * @param {Object} payload - The payload with payment details
- * @returns {Promise<String>} - The payment redirection URL
- */
+// 🔗 สร้าง URL ชำระเงินแบบ manual
 export const generatePaymentUrl = async (payload) => {
   try {
-    // Validate payload
     validatePayload(payload, ["amount", "order_id"]);
-
-    const response = await axios.post("/payments/generate-url", payload);
-    console.log("✅ [PaymentService] Payment URL Generated:", response.data);
-
-    // Ensure the paymentUrl exists
-    const paymentUrl = response.data.paymentUrl;
-    if (!paymentUrl) {
-      console.error("❌ Payment URL is missing in the response.");
-      throw new Error("Payment URL is missing in the response.");
-    }
-
-    return paymentUrl; // Return the generated payment URL
+    const res = await axios.post("/payments/generate-url", payload);
+    const url = res?.data?.paymentUrl;
+    if (!url) throw new Error("ไม่พบ Payment URL ใน response.");
+    return url;
   } catch (error) {
-    console.error(
-      "❌ [PaymentService] Error generating payment URL:",
-      error.response?.data || error.message
-    );
-    // Throw the error response or a default error
-    throw error.response?.data || new Error("Failed to generate payment URL");
+    const errMsg = error?.response?.data?.error || error.message;
+    console.error("❌ [generatePaymentUrl]", errMsg);
+    throw new Error(errMsg);
   }
 };
