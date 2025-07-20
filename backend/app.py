@@ -152,9 +152,10 @@ def setup_cli_utilities(app):
             function = current_app.view_functions[rule.endpoint].__name__
             print(f"{methods:<10} {str(rule):<50} {function:<50}")
 
+app = create_app()  # <== ✅ ใส่นอก if เพื่อให้ Gunicorn/Railway มองเห็น
+
 if __name__ == "__main__":
     try:
-        app = create_app()
         print("\n📦 Registered Routes:")
         for rule in app.url_map.iter_rules():
             methods = ','.join(rule.methods)
