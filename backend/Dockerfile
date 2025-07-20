@@ -6,8 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     FLASK_ENV=production \
     PYTHONPATH=/app \
-    GOOGLE_APPLICATION_CREDENTIALS=/app/config/credentials.json \
-    DEBIAN_FRONTEND=noninteractive
+    GOOGLE_APPLICATION_CREDENTIALS=/app/config/credentials.json
 
 # ✅ Set working directory
 WORKDIR /app
@@ -21,12 +20,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     tesseract-ocr-tha \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# ✅ Copy Python dependencies file
+COPY backend/requirements.txt ./requirements.txt
+
 # ✅ Install Python dependencies
-COPY requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# ✅ Copy all source code
-COPY . /app
+# ✅ Copy backend code
+COPY backend /app/backend
 
 # ✅ Expose Flask port
 EXPOSE 5000
