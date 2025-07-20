@@ -6,7 +6,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     FLASK_ENV=production \
     PYTHONPATH=/app \
-    GOOGLE_APPLICATION_CREDENTIALS=/app/config/credentials.json
+    GOOGLE_APPLICATION_CREDENTIALS=/app/config/credentials.json \
+    DEBIAN_FRONTEND=noninteractive
 
 # ✅ Set working directory
 WORKDIR /app
@@ -24,8 +25,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# ✅ Copy backend code
-COPY . /app/backend
+# ✅ Copy all source code
+COPY . /app
 
 # ✅ Expose Flask port
 EXPOSE 5000
