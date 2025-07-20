@@ -34,8 +34,6 @@ ALLOWED_ORIGINS = [
     "https://app.cheetahinsurancebroker.com",
     "https://api.cheetahinsurancebroker.com"
 ]
-
-
 def create_app():
     # === Decode Base64 .env Secrets ===
     secrets = {
@@ -50,24 +48,39 @@ def create_app():
 
     # === Initialize Flask App ===
     app_root = os.path.abspath(os.path.dirname(__file__))
-
+    
     # 🔧 สำหรับ Production บน Railway: ใช้ build ใน backend/build
     frontend_build_path = os.path.join(app_root, "build")
+    static_path = os.path.join(frontend_build_path, "static")
 
-    app = Flask(__name__, static_folder=frontend_build_path, static_url_path="/")
+    app = Flask(__name__, static_folder=static_path, static_url_path="/static")
     app.config.from_object(Config)
-    logger.info(f"🚀 Starting Flask application with static folder: {frontend_build_path}")
+
+    logger.info(f"🚀 Starting Flask app with build folder: {frontend_build_path}")
+    logger.info(f"📁 Static files served from: {static_path}")
 
     # === Register System ===
     init_extensions(app)
     configure_app(app)
     register_blueprints(app)
-    register_spa_fallback(app)
+    setup_spa_routes(app, frontend_build_path)
     setup_jwt_error_handlers(jwt)
     setup_cli_utilities(app)
     register_services(app)
 
     return app
+
+
+def setup_spa_routes(app, build_path):
+    """Serve React index.html for unmatched routes (SPA fallback)."""
+    @app.route("/", defaults={"path": ""})
+    @app.route("/<path:path>")
+    def serve_spa(path):
+        full_path = os.path.join(build_path, path)
+        if path != "" and os.path.exists(full_path):
+            return send_from_directory(build_path, path)
+        return send_from_directory(build_path, "index.html")
+
 
 
 def init_extensions(app):
