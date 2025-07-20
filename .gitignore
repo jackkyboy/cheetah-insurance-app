@@ -40,9 +40,12 @@ backend/static/uploads/
 backend/config/credentials.json
 cheetah-insurance-broker-7fd6654a42ca.json
 
+credentials.json
 
 # Frontend build
-cheetah-insurance-app/build/
-frontend/build/
+# Build output
+-build/
+-dist/
+
 bolttech.co.th_files/
 *extracted_insurance_data.csv

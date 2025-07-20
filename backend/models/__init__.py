@@ -1,9 +1,13 @@
 # /Users/apichet/Downloads/cheetah-insurance-app/backend/models/__init__.py
 # /Users/apichet/Downloads/cheetah-insurance-app/backend/models/__init__.py
 # /Users/apichet/Downloads/cheetah-insurance-app/backend/models/__init__.py
+# ✅ Force SQLAlchemy to use PyMySQL instead of MySQLdb
+import pymysql
+pymysql.install_as_MySQLdb()
+
 import importlib
 import logging
-from backend.db import db  # ✅ ใช้ db instance เดียวจาก backend/db.py
+from backend.db import db  # ✅ ใช้ db instance เดียวจาก backend/db.py db  # ✅ ใช้ db instance เดียวจาก backend/db.py
 
 # Configure Logging
 logging.basicConfig(level=logging.DEBUG)
