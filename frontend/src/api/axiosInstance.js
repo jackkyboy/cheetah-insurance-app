@@ -1,4 +1,6 @@
 // /Users/apichet/Downloads/cheetah-insurance-app/src/api/axiosInstance.js
+// src/api/axiosInstance.js
+
 import axios from "axios";
 import { 
   getAuthToken, 
@@ -8,10 +10,10 @@ import {
   clearTokens 
 } from "./authService";
 
-// ✅ baseURL ถูก set ผ่าน .env.production ระหว่าง build
-const BASE_URL = import.meta.env?.REACT_APP_API_BASE_URL || process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:5000/api";
+// ✅ ใช้ baseURL จาก .env ที่ถูก inject ตอน build
+const BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:5000/api";
 
-console.log("🌐 axiosInstance BASE_URL =", BASE_URL); // ลอง log ดูว่ามาไหม (dev only)
+console.log("🌐 axiosInstance BASE_URL =", BASE_URL); // 🧪 ลบออกหลัง deploy จริง
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -19,7 +21,7 @@ const axiosInstance = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-// ========== ✅ Global Refresh Token Handling ==========
+// 🔄 สำหรับ refresh token
 let isRefreshing = false;
 let refreshSubscribers = [];
 
@@ -29,29 +31,19 @@ const onRefreshed = (token) => {
   refreshSubscribers = [];
 };
 
-// ========== ✅ Request Interceptor ==========
+// ✅ Request Interceptor
 axiosInstance.interceptors.request.use(
   async (config) => {
-    let token = getAuthToken();
-    if (!token && !isRefreshing) {
-      isRefreshing = true;
-      token = await refreshAccessToken();
-      isRefreshing = false;
-      if (token) saveAuthToken(token);
-    }
-
+    const token = getAuthToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-    } else {
-      console.warn("⚠️ No token available, sending unauthenticated request.");
     }
-
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// ========== ✅ Response Interceptor ==========
+// ✅ Response Interceptor
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
