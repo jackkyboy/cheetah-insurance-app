@@ -14,12 +14,14 @@ from backend.models import initialize_models, init_app
 from backend.routes import register_blueprints, configure_app
 from backend.services.bigquery_service import BigQueryService
 from backend.utils import decode_secrets
+import pymysql
 
 # === Logger Setup ===
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
 jwt = JWTManager()
+pymysql.install_as_MySQLdb()
 
 ALLOWED_ORIGINS = [
     "http://localhost:3000",

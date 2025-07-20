@@ -1,4 +1,4 @@
-# /Users/apichet/Downloads/cheetah-insurance-app/backend/kafka_subscriber/requirements.txt
+# /Users/apichet/Downloads/cheetah-insurance-app/backend/requirements.txt
 alembic==1.14.0
 blinker==1.9.0
 cachetools==5.5.0
