@@ -36,8 +36,6 @@ ALLOWED_ORIGINS = [
 ]
 
 
-
-
 def create_app():
     # === Decode Base64 .env Secrets ===
     secrets = {
@@ -52,7 +50,9 @@ def create_app():
 
     # === Initialize Flask App ===
     app_root = os.path.abspath(os.path.dirname(__file__))
-    frontend_build_path = os.path.join(app_root, "../frontend/build")
+
+    # 🔧 สำหรับ Production บน Railway: ใช้ build ใน backend/build
+    frontend_build_path = os.path.join(app_root, "build")
 
     app = Flask(__name__, static_folder=frontend_build_path, static_url_path="/")
     app.config.from_object(Config)
@@ -68,6 +68,7 @@ def create_app():
     register_services(app)
 
     return app
+
 
 def init_extensions(app):
     cache.init_app(app)
