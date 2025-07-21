@@ -3,52 +3,44 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { saveAdminAuthToken, saveAdminRefreshToken } from "./adminAuthService";
 
-// ✅ กำหนดค่า BASE URL
 const BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:5000/api";
-console.log("🚀 Using API BASE URL:", BASE_URL);
 
-// ✅ กำหนดคีย์ที่ใช้เก็บ Token ใน LocalStorage
+// 👉 ปิด log นี้เมื่อ production
+if (process.env.NODE_ENV !== "production") {
+  console.log("🚀 Using API BASE URL:", BASE_URL);
+}
+
 const AUTH_TOKEN_KEY = "authToken";
 const REFRESH_TOKEN_KEY = "refreshToken";
 const USER_ROLE_KEY = "userRole";
 
-// ✅ ฟังก์ชันดึง Token
+// 🔐 Token management
 export const getAuthToken = () => localStorage.getItem(AUTH_TOKEN_KEY);
 export const getRefreshToken = () => localStorage.getItem(REFRESH_TOKEN_KEY);
 export const getUserRole = () => localStorage.getItem(USER_ROLE_KEY);
 
-// ✅ ฟังก์ชันบันทึก Token
 export const saveAuthToken = (token) => {
   if (token) {
-    const decodedToken = jwtDecode(token);
-    const role = decodedToken?.role || "user";
-    if (role === "admin") {
-      saveAdminAuthToken(token);
-    } else {
-      localStorage.setItem(AUTH_TOKEN_KEY, token);
-    }
+    const decoded = jwtDecode(token);
+    const role = decoded?.role || "user";
+    if (role === "admin") saveAdminAuthToken(token);
+    else localStorage.setItem(AUTH_TOKEN_KEY, token);
   }
 };
 
 export const saveRefreshToken = (token) => {
   if (token) {
-    const decodedToken = jwtDecode(token);
-    const role = decodedToken?.role || "user";
-    if (role === "admin") {
-      saveAdminRefreshToken(token);
-    } else {
-      localStorage.setItem(REFRESH_TOKEN_KEY, token);
-    }
+    const decoded = jwtDecode(token);
+    const role = decoded?.role || "user";
+    if (role === "admin") saveAdminRefreshToken(token);
+    else localStorage.setItem(REFRESH_TOKEN_KEY, token);
   }
 };
 
 export const saveUserRole = (role) => {
-  if (role) {
-    localStorage.setItem(USER_ROLE_KEY, role);
-  }
+  if (role) localStorage.setItem(USER_ROLE_KEY, role);
 };
 
-// ✅ ฟังก์ชันเคลียร์ Token
 export const clearTokens = () => {
   localStorage.removeItem(AUTH_TOKEN_KEY);
   localStorage.removeItem(REFRESH_TOKEN_KEY);
@@ -56,169 +48,120 @@ export const clearTokens = () => {
   window.location.href = "/login";
 };
 
-// ✅ สร้าง Axios Instance
 const apiClient = axios.create({
   baseURL: BASE_URL,
   headers: { "Content-Type": "application/json" },
-  withCredentials: true, // ✅ เพิ่มบรรทัดนี้
+  withCredentials: true,
 });
 
-
-// ✅ ฟังก์ชัน Refresh Token
 export const refreshAccessToken = async () => {
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) return null;
+
   try {
-    const refreshToken = getRefreshToken();
-    console.log("🔄 [refreshAccessToken] Attempting to refresh token with:", refreshToken);
+    const res = await axios.post(`${BASE_URL}/auth/refresh`, { refresh_token: refreshToken });
+    const { access_token, refresh_token } = res.data || {};
 
-    if (!refreshToken) {
-      console.warn("❌ [refreshAccessToken] No refresh token found. Logging out...");
-      return null;
-    }
+    if (!access_token) return null;
 
-    const response = await axios.post(`${BASE_URL}/auth/refresh`, { refresh_token: refreshToken });
-    console.log("✅ [refreshAccessToken] Token refreshed successfully:", response.data);
-
-    if (!response.data?.access_token) {
-      console.error("❌ [refreshAccessToken] No access token received.");
-      return null;
-    }
-
-    saveAuthToken(response.data.access_token);
-    saveRefreshToken(response.data.refresh_token || refreshToken); // บันทึก Refresh Token ใหม่ (ถ้ามี)
-    return response.data.access_token;
-  } catch (error) {
-    console.error("❌ [refreshAccessToken] Refresh failed:", error.response?.data || error.message);
+    saveAuthToken(access_token);
+    saveRefreshToken(refresh_token || refreshToken);
+    return access_token;
+  } catch (err) {
     return null;
   }
 };
 
-
-// ✅ Interceptor สำหรับแนบ Token ใน Request
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = getAuthToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-// ✅ จัดการ Refresh Token แบบอัตโนมัติ
+// Interceptors
 let isRefreshing = false;
 let refreshSubscribers = [];
 
-function onRefreshed(newToken) {
-  refreshSubscribers.forEach((callback) => callback(newToken));
+const onRefreshed = (token) => {
+  refreshSubscribers.forEach((cb) => cb(token));
   refreshSubscribers = [];
-}
+};
+
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = getAuthToken();
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+    return config;
+  },
+  (err) => Promise.reject(err)
+);
 
 apiClient.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
+  (res) => res,
+  async (err) => {
+    const originalRequest = err.config;
 
-    console.warn(`[Interceptor] API Error: ${error.response?.status}`, error.response?.data || error.message);
-
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (err.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      if (!isRefreshing) {
-        isRefreshing = true;
-        console.log("🔄 [Interceptor] Refreshing token...");
-        const newAccessToken = await refreshAccessToken();
-        isRefreshing = false;
-        if (!newAccessToken) {
-          console.error("❌ [Interceptor] Refresh token failed. Logging out.");
-          clearTokens();
-          return Promise.reject(error);
-        }
-
-        console.log("✅ [Interceptor] Using new access token:", newAccessToken);
-        saveAuthToken(newAccessToken);
-        onRefreshed(newAccessToken);
+      if (isRefreshing) {
+        return new Promise((resolve) => {
+          refreshSubscribers.push((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            resolve(apiClient(originalRequest));
+          });
+        });
       }
 
-      return new Promise((resolve, reject) => {
-        refreshSubscribers.push((newToken) => {
-          originalRequest.headers.Authorization = `Bearer ${newToken}`;
-          resolve(apiClient(originalRequest));
-        });
-      });
+      isRefreshing = true;
+      const newToken = await refreshAccessToken();
+      isRefreshing = false;
+
+      if (!newToken) {
+        clearTokens();
+        return Promise.reject(err);
+      }
+
+      saveAuthToken(newToken);
+      onRefreshed(newToken);
+      originalRequest.headers.Authorization = `Bearer ${newToken}`;
+      return apiClient(originalRequest);
     }
 
-    return Promise.reject(error);
+    return Promise.reject(err);
   }
 );
 
-
-// ✅ ฟังก์ชัน Login
+// 🔐 Auth functions
 export const login = async (email, password) => {
-  try {
-    const response = await apiClient.post(`/auth/login`, { email, password });
+  const res = await apiClient.post(`/auth/login`, { email, password });
+  const { access_token, refresh_token, user } = res.data;
 
-    if (!response.data?.access_token || !response.data?.refresh_token || !response.data?.user?.role) {
-      throw new Error("Invalid login response.");
-    }
-
-    saveAuthToken(response.data.access_token);
-    saveRefreshToken(response.data.refresh_token);
-    saveUserRole(response.data.user.role || "user");
-
-    return {
-      access_token: response.data.access_token,
-      refresh_token: response.data.refresh_token,
-      role: response.data.user.role
-    };
-
-  } catch (err) {
-    console.error("❌ Login failed:", err.response?.data || err.message);
-    throw err;
+  if (!access_token || !refresh_token || !user?.role) {
+    throw new Error("Invalid login response.");
   }
+
+  saveAuthToken(access_token);
+  saveRefreshToken(refresh_token);
+  saveUserRole(user.role);
+
+  return { access_token, refresh_token, role: user.role };
 };
 
-// ✅ ฟังก์ชัน Logout
 export const logout = () => clearTokens();
 
-// ✅ ฟังก์ชันดึงข้อมูลผู้ใช้ที่ล็อกอินอยู่
 export const fetchAuthenticatedUser = async () => {
-  try {
-    const { data } = await apiClient.get(`/user/profile`);
-    return data;
-  } catch (err) {
-    throw err;
-  }
+  const { data } = await apiClient.get(`/user/profile`);
+  return data;
 };
 
-// ✅ ฟังก์ชัน Register
 export const register = async (userData) => {
-  try {
-    const { data } = await apiClient.post(`/auth/register`, userData);
-    return data;
-  } catch (err) {
-    throw err;
-  }
+  const { data } = await apiClient.post(`/auth/register`, userData);
+  return data;
 };
 
-// ✅ ฟังก์ชัน Request Password Reset
 export const requestPasswordReset = async (email) => {
-  try {
-    const response = await apiClient.post(`/auth/forgot-password`, { email });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const { data } = await apiClient.post(`/auth/forgot-password`, { email });
+  return data;
 };
 
-// ✅ ฟังก์ชัน Reset Password
 export const resetPassword = async (token, newPassword) => {
-  try {
-    const response = await apiClient.post(`/auth/reset-password`, { token, new_password: newPassword });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const { data } = await apiClient.post(`/auth/reset-password`, { token, new_password: newPassword });
+  return data;
 };
 
 export default apiClient;
