@@ -67,7 +67,7 @@ const SearchResults = () => {
   const totalPages = Math.ceil(filteredResults.length / itemsPerPage);
 
   const sanitizeLogoUrl = (url) => {
-    const baseUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:5000";
+    const baseUrl = process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:5000";
     return !url || url.includes("default-logo.svg")
       ? `${baseUrl}/logos/default-logo.svg`
       : url.startsWith("http") ? url : `${baseUrl}${url}`;

@@ -10,7 +10,7 @@
  * @returns {string} The sanitized full logo URL.
  */
 export const sanitizeLogoUrl = (logoUrl) => {
-  const defaultLogo = `${process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:5000"}/logos/default-logo.svg`;
+  const defaultLogo = `${process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:5000"}/logos/default-logo.svg`;
 
   try {
     console.log(`🔍 [sanitizeLogoUrl] Input logo URL: "${logoUrl}"`);
@@ -29,7 +29,7 @@ export const sanitizeLogoUrl = (logoUrl) => {
 
     // If logoUrl is a relative path
     if (logoUrl.startsWith("/")) {
-      const fullUrl = `${process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:5000"}${logoUrl}`;
+      const fullUrl = `${process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:5000"}${logoUrl}`;
       console.log(`✅ [sanitizeLogoUrl] Relative path detected. Full URL constructed: "${fullUrl}"`);
       return fullUrl;
     }

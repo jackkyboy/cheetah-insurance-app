@@ -14,7 +14,7 @@ import { HashRouter } from "react-router-dom";
 console.log("✅ ReactDOM starting...");
 console.log("🧪 NODE_ENV =", process.env.NODE_ENV);
 console.log("🧪 REACT_APP_API_BASE_URL =", process.env.REACT_APP_API_BASE_URL);
-console.log("🧪 REACT_APP_BACKEND_URL =", process.env.REACT_APP_BACKEND_URL);
+console.log("🧪 REACT_APP_API_BASE_URL =", process.env.REACT_APP_API_BASE_URL);
 
 // 🔍 Grab root DOM node
 const rootEl = document.getElementById("root");

@@ -5,7 +5,7 @@ import axios from "../api/axios";
  * Utility functions for API requests and error handling
  */
 
-const BASE_URL = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:5000";
+const BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:5000";
 
 /**
  * Handle API Request with enhanced error handling, array support, and better logging.
