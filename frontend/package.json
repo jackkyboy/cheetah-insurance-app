@@ -1,7 +1,7 @@
 {
   "name": "cheetah-insurance-app",
   "version": "1.0.0",
-  "homepage": "/",
+  "homepage": ".",
   "main": "index.js",
   "scripts": {
     "start": "react-scripts start",
