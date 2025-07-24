@@ -70,8 +70,10 @@ class Config:
         "http://localhost:3001",
         "https://cheetahinsurancebroker.com",
         "https://app.cheetahinsurancebroker.com",
-        "https://63894e1bb428.ngrok-free.app"
+        "https://63894e1bb428.ngrok-free.app",
+        "https://cheetah-frontend.up.railway.app"  # ✅ เพิ่มบรรทัดนี้
     ])).split(",")
+
 
     # --- Database ---
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
