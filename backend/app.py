@@ -25,15 +25,16 @@ pymysql.install_as_MySQLdb()
 
 ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "http://localhost:3001",  # ✅ เพิ่มอันนี้
+    "http://localhost:3001",
     "http://127.0.0.1:5000",
-    "http://localhost:5000",
     "http://localhost",
     "http://0.0.0.0",
     "https://cheetahinsurancebroker.com",
     "https://app.cheetahinsurancebroker.com",
-    "https://api.cheetahinsurancebroker.com"
+    "https://api.cheetahinsurancebroker.com",
+    "https://cheetah-frontend.up.railway.app"
 ]
+
 def create_app():
     # === Decode Base64 .env Secrets ===
     secrets = {
