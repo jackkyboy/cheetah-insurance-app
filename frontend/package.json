@@ -4,7 +4,7 @@
   "homepage": ".",
   "main": "index.js",
   "scripts": {
-    "start": "react-scripts start",
+    "start": "serve -s build",
     "build": "react-scripts build",
     "build:clean": "GENERATE_SOURCEMAP=false react-scripts build",
     "test": "react-scripts test",
