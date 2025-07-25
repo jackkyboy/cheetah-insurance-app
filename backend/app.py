@@ -48,10 +48,11 @@ def create_app():
     register_services(app)
 
     # ✅ Add CORS Headers after each request
-    allowed_origins = Config.CORS_ALLOWED_ORIGINS.split(",")
+    allowed_origins = Config.CORS_ALLOWED_ORIGINS  # <- ไม่ต้อง .split()
     app.after_request(lambda response: add_cors_headers(response, allowed_origins))
 
     return app
+
 
 
 def _decode_env_secrets():
