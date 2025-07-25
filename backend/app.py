@@ -1,8 +1,7 @@
 # /Users/apichet/Downloads/cheetah-insurance-app/backend/app.py
-# backend/app.py
-# backend/app.py
 import os
 import logging
+import pymysql
 from flask import Flask, jsonify, current_app, request, send_from_directory
 from flask_migrate import Migrate
 from flask_cors import CORS
@@ -10,12 +9,11 @@ from flask_jwt_extended import JWTManager
 
 from backend.config.config import Config
 from backend.db import db
-from backend.extensions import cache
+from backend.extensions import init_extensions
 from backend.models import initialize_models, init_app
 from backend.routes import register_blueprints, configure_app
 from backend.services.bigquery_service import BigQueryService
 from backend.utils import decode_secrets
-import pymysql
 
 # === Logger Setup ===
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -27,6 +25,36 @@ pymysql.install_as_MySQLdb()
 
 def create_app():
     # === Decode Base64 .env Secrets ===
+    _decode_env_secrets()
+
+    # === Initialize Flask App ===
+    app_root = os.path.abspath(os.path.dirname(__file__))
+    build_path = os.path.join(app_root, "build")
+    static_path = os.path.join(build_path, "static")
+
+    app = Flask(__name__, static_folder=static_path, static_url_path="/static")
+    app.config.from_object(Config)
+
+    logger.info(f"🚀 Starting Flask app with build folder: {build_path}")
+    logger.info(f"📁 Static files served from: {static_path}")
+
+    # === Register System ===
+    init_extensions(app)
+    configure_app(app)
+    register_blueprints(app)
+    setup_spa_routes(app, build_path)
+    setup_jwt_error_handlers(jwt)
+    setup_cli_utilities(app)
+    register_services(app)
+
+    # ✅ Add CORS Headers after each request
+    allowed_origins = Config.CORS_ALLOWED_ORIGINS.split(",")
+    app.after_request(lambda response: add_cors_headers(response, allowed_origins))
+
+    return app
+
+
+def _decode_env_secrets():
     secrets = {
         "SANDBOX_PKCS7_BASE64": "/tmp/sandbox-pkcs7.cer",
         "PRIVATE_KEY_BASE64": "/tmp/merchant-private-key.der",
@@ -36,41 +64,6 @@ def create_app():
     for env_key, file_path in secrets.items():
         decode_secrets.decode_env_to_file(env_key, file_path)
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = secrets["GOOGLE_CREDENTIALS_BASE64"]
-
-    # === Initialize Flask App ===
-    app_root = os.path.abspath(os.path.dirname(__file__))
-    frontend_build_path = os.path.join(app_root, "build")
-    static_path = os.path.join(frontend_build_path, "static")
-
-    app = Flask(__name__, static_folder=static_path, static_url_path="/static")
-    app.config.from_object(Config)
-
-    logger.info(f"🚀 Starting Flask app with build folder: {frontend_build_path}")
-    logger.info(f"📁 Static files served from: {static_path}")
-
-    # === Register System ===
-    init_extensions(app)
-    configure_app(app)
-    register_blueprints(app)
-    setup_spa_routes(app, frontend_build_path)
-    setup_jwt_error_handlers(jwt)
-    setup_cli_utilities(app)
-    register_services(app)
-
-    return app
-
-
-def init_extensions(app):
-    cache.init_app(app)
-    app.extensions.setdefault("cache", {})["default"] = cache
-
-    allowed_origins = Config.CORS_ALLOWED_ORIGINS.split(",")
-    CORS(app, origins=allowed_origins, supports_credentials=True)
-    app.after_request(lambda response: add_cors_headers(response, allowed_origins))
-
-    jwt.init_app(app)
-    init_app(app)
-    Migrate(app, db)
 
 
 def add_cors_headers(response, allowed_origins):
@@ -88,7 +81,7 @@ def setup_spa_routes(app, build_path):
     @app.route("/<path:path>")
     def serve_spa(path):
         full_path = os.path.join(build_path, path)
-        if path != "" and os.path.exists(full_path):
+        if path and os.path.exists(full_path):
             return send_from_directory(build_path, path)
         return send_from_directory(build_path, "index.html")
 
